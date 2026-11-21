@@ -1,0 +1,45 @@
+{
+  "name": "flor-de-pitanga",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Gestão de ateliê: estoque, custeio, produção, vendas e financeiro — Flor de Pitanga",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n api,web -c magenta,cyan \"npm run dev -w @pitanga/api\" \"npm run dev -w @pitanga/web\"",
+    "build": "npm run build -w @pitanga/shared -w @pitanga/core -w @pitanga/api -w @pitanga/web",
+    "start": "npm run start -w @pitanga/api",
+    "db:migrate": "tsx tools/db-cli.ts migrate",
+    "db:seed": "tsx tools/db-cli.ts seed",
+    "db:reset": "tsx tools/db-cli.ts reset",
+    "db:check": "tsx tools/db-cli.ts check",
+    "backup": "tsx tools/backup-cli.ts backup",
+    "restore": "tsx tools/backup-cli.ts restore",
+    "senha": "tsx tools/backup-cli.ts senha",
+    "test": "npm run test --workspaces --if-present",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "typecheck": "npm run typecheck --workspaces --if-present && tsc -p tools/tsconfig.json",
+    "dist:win": "node tools/dist-win.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^26.6.6",
+    "concurrently": "^10.0.7",
+    "eslint": "^10.15.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "prettier": "^3.10.1",
+    "tsup": "^9.0.0",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.73.0",
+    "vitest": "^5.1.1"
+  }
+}

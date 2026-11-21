@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  qualidade:
+    runs-on: windows-latest # o produto roda no Windows 11: o CI também
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - name: Conferência de consistência sobre a base fictícia
+        run: |
+          npm run db:reset
+          npm run db:check
+        env:
+          FDP_DATA_DIR: ${{ runner.temp }}\fdp-dados

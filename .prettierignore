@@ -1,0 +1,7 @@
+node_modules
+dist
+dados
+package-lock.json
+*.sql
+release
+dist-electron

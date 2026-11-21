@@ -1,0 +1,5 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": { "types": ["node"] },
+  "include": ["./*.ts", "../apps/api/src/types.d.ts"]
+}

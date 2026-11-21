@@ -1,0 +1,42 @@
+/* Folha de impressão dos relatórios: sem menu, sem botões, tabela em largura total. */
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 12mm;
+  }
+  body {
+    background: #fff !important;
+    font-size: 11px;
+  }
+  .nao-imprimir,
+  aside,
+  nav,
+  button,
+  .toast-area {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+  .so-impressao {
+    display: block !important;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    border-bottom: 1px solid #ccc;
+    padding: 3px 6px;
+  }
+  .cartao {
+    box-shadow: none !important;
+    border: 1px solid #ddd !important;
+    break-inside: avoid;
+  }
+}
+.so-impressao {
+  display: none;
+}

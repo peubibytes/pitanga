@@ -1,0 +1,101 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Tokens de design do Flor de Pitanga. Cores em "R G B" (aceitam opacidade no Tailwind).
+ * Pitanga = destaque e alerta; folha = disponível/positivo; creme = fundo; tinta = texto.
+ */
+:root {
+  --pitanga-50: 255 241 239;
+  --pitanga-100: 255 224 220;
+  --pitanga-200: 252 190 183;
+  --pitanga-400: 232 119 110;
+  --pitanga-500: 217 74 63;
+  --pitanga-600: 200 55 45;
+  --pitanga-700: 160 41 34;
+  --pitanga-800: 128 34 29;
+
+  --folha-50: 238 247 240;
+  --folha-100: 216 237 221;
+  --folha-500: 77 150 96;
+  --folha-600: 63 125 78;
+  --folha-700: 49 98 62;
+
+  --ambar-50: 255 247 230;
+  --ambar-100: 255 236 196;
+  --ambar-600: 181 118 14;
+  --ambar-700: 143 92 8;
+
+  --creme-50: 255 252 247;
+  --creme-100: 250 244 235;
+  --creme-200: 241 231 217;
+  --creme-300: 226 211 191;
+
+  --tinta-400: 150 137 129;
+  --tinta-500: 115 102 95;
+  --tinta-600: 88 76 70;
+  --tinta-700: 62 52 47;
+  --tinta-900: 36 28 25;
+
+  --raio-cartao: 14px;
+  --raio-campo: 10px;
+}
+
+html,
+body,
+#raiz {
+  height: 100%;
+}
+
+body {
+  @apply bg-creme-100 font-sans text-tinta-900 antialiased;
+  font-size: 15px;
+}
+
+h1,
+h2,
+h3 {
+  @apply font-titulo text-tinta-900;
+}
+
+:focus-visible {
+  outline: 2px solid rgb(var(--pitanga-500));
+  outline-offset: 2px;
+}
+
+/* Números alinhados em colunas */
+.numero {
+  font-variant-numeric: tabular-nums;
+}
+
+dialog::backdrop {
+  background: rgb(36 28 25 / 0.45);
+  backdrop-filter: blur(2px);
+}
+
+@keyframes esqueleto {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+.esqueleto {
+  background: linear-gradient(
+    90deg,
+    rgb(var(--creme-200)) 25%,
+    rgb(var(--creme-100)) 50%,
+    rgb(var(--creme-200)) 75%
+  );
+  background-size: 200% 100%;
+  animation: esqueleto 1.4s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .esqueleto {
+    animation: none;
+  }
+}
