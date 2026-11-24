@@ -35,6 +35,7 @@ import {
   Selecao,
 } from '../../components/ui';
 import { ApiError, api } from '../../lib/api';
+import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useDados, useItem, useMutacao } from '../../lib/query';
 
 interface FichaForm {
@@ -92,6 +93,7 @@ export default function PaginaFichaEditor() {
       extras: [],
     },
   });
+  useAvisoDeSaida(f.formState.isDirty);
   const itens = useFieldArray({ control: f.control, name: 'itens' });
   const extras = useFieldArray({ control: f.control, name: 'extras' });
 

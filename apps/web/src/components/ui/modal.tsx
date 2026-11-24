@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { clsx } from 'clsx';
 import { Botao } from './botao';
 import { Entrada } from './campo';
@@ -16,17 +16,27 @@ interface ModalProps {
 /** Janela modal sobre o elemento <dialog>: foco preso, ESC fecha, leitores de tela anunciam o título. */
 export function Modal({ aberto, aoFechar, titulo, children, rodape, tamanho = 'm' }: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
+  // Id próprio: uma janela pode abrir sobre outra (ex.: nova categoria dentro de um cadastro).
+  const tituloId = useId();
   useEffect(() => {
     const d = ref.current;
     if (!d) return;
-    if (aberto && !d.open) d.showModal();
+    if (aberto && !d.open) {
+      d.showModal();
+      // O navegador focaria o "X"; quem abre uma janela com campos quer digitar no primeiro.
+      d.querySelector<HTMLElement>(
+        '[data-conteudo] :is(input, select, textarea):not(:disabled, [type=hidden])',
+      )?.focus();
+    }
     if (!aberto && d.open) d.close();
   }, [aberto]);
   return (
     <dialog
       ref={ref}
-      aria-labelledby="modal-titulo"
+      aria-labelledby={tituloId}
       onCancel={(e) => {
+        // No React o "cancel" sobe pela árvore: Esc na janela de cima não pode fechar a de baixo.
+        if (e.target !== e.currentTarget) return;
         e.preventDefault();
         aoFechar();
       }}
@@ -41,7 +51,7 @@ export function Modal({ aberto, aoFechar, titulo, children, rodape, tamanho = 'm
       {aberto && (
         <div className="flex max-h-[88vh] flex-col">
           <header className="flex items-center justify-between border-b border-creme-200 px-5 py-4">
-            <h2 id="modal-titulo" className="text-xl">
+            <h2 id={tituloId} className="text-xl">
               {titulo}
             </h2>
             <button
@@ -52,7 +62,9 @@ export function Modal({ aberto, aoFechar, titulo, children, rodape, tamanho = 'm
               <X className="h-5 w-5" />
             </button>
           </header>
-          <div className="overflow-y-auto p-5">{children}</div>
+          <div data-conteudo className="overflow-y-auto p-5">
+            {children}
+          </div>
           {rodape && (
             <footer className="flex justify-end gap-2 border-t border-creme-200 bg-creme-50 px-5 py-3">
               {rodape}

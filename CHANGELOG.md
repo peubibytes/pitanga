@@ -6,11 +6,27 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) · versiona
 
 ### Alterado
 
+- **Pacote do Windows:** `iniciar.bat`, `parar.bat` e `instalar-servico.ps1` saem da raiz e ficam em `suporte/` (modo suporte, com console). A opção `--instalador` virou padrão; use `--sem-instalador` para gerar só a pasta portátil.
 - **Modo 100% local, sem login:** o app abre direto no Painel em `http://127.0.0.1:1971` (porta padrão, antes 4317). A API age como a primeira administradora ativa (criada como "Ateliê" se não houver nenhuma); saíram a tela de entrada, o botão "Sair" e a aba "Usuárias". Novo filtro do cabeçalho `Host` (só `127.0.0.1`, `localhost`, `[::1]`) contra DNS rebinding.
+
+### Adicionado
+
+- **Instalador com janela própria** como entregável padrão de `npm run dist:win` (e artefato do CI): instala por usuário, sem administrador, com ícone na Área de Trabalho e no menu Iniciar. Sem assinatura de código; o manual ensina a passar pelo SmartScreen. Ver ADR 0007.
+- **Encerramento limpo:** fechar a janela encerra a API por IPC (fallback após 8 s), esperando backup ou restauração em andamento. Se a janela cair, a API encerra sozinha.
+- **Confirmação ao fechar** a janela só quando há formulário com alterações não salvas.
+- Aviso quando outra versão do programa já está aberta, em vez de usar a API antiga sem dizer nada.
+- **Categorias:** criar, renomear e remover categorias de produtos e de materiais em _Configurações → Categorias_, e "+ Nova categoria" dentro dos cadastros. Categoria em uso só sai movendo os itens para outra, numa transação. Criar, renomear, mover e remover ficam na auditoria; nomes repetidos são recusados sem distinguir maiúsculas nem acentos.
+
+### Corrigido
+
+- **Edição de materiais:** botão "Editar" em cada linha da lista; a mensagem de erro da API aparece dentro da janela (antes ficava atrás dela, e "Salvar" parecia não fazer nada); cancelar descarta o que foi digitado.
+- **Unidade do material:** a API recusa trocar a unidade também quando o material é usado em receitas (antes, 250 ml viravam 250 un em silêncio). A tela só trava a unidade quando a API travaria.
+- **Janelas:** ao abrir, o foco vai para o primeiro campo (antes ia para o "X"); Esc fecha só a janela de cima.
+- Tabelas: Enter em um botão da linha não abre mais o detalhe da linha.
 
 ### Pendente do plano
 
-- Roteiros fim a fim com Playwright (etapa 8, opcional) e geração do instalador `.exe` assinado.
+- Roteiros fim a fim com Playwright (etapa 8, opcional).
 - Etapa 9 (estabilização com uso real): registrar aqui os ajustes depois dos primeiros fechamentos de mês.
 
 ## [0.1.0] — primeira construção do repositório

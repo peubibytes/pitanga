@@ -41,6 +41,7 @@ import {
   Selecao,
 } from '../../components/ui';
 import { api } from '../../lib/api';
+import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useChaveIdempotencia, useMutacao } from '../../lib/query';
 
 interface ItemForm {
@@ -93,6 +94,7 @@ export default function PaginaCompraNova() {
       despesas: [],
     },
   });
+  useAvisoDeSaida(f.formState.isDirty);
   const itens = useFieldArray({ control: f.control, name: 'itens' });
   const despesas = useFieldArray({ control: f.control, name: 'despesas' });
   const vistos = useWatch({ control: f.control, name: 'itens' });

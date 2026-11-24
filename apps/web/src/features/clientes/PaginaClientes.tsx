@@ -25,6 +25,7 @@ import {
   Tabela,
 } from '../../components/ui';
 import { api } from '../../lib/api';
+import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useLista, useMutacao } from '../../lib/query';
 import { useDebounce } from '../../lib/util';
 
@@ -49,6 +50,7 @@ export function ModalCliente({
       ativo: cliente?.ativo ?? true,
     },
   });
+  useAvisoDeSaida(aberto && f.formState.isDirty);
   const navegar = useNavigate();
   const salvar = useMutacao(
     (d: ClienteEntrada) =>

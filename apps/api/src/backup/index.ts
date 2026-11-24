@@ -14,6 +14,7 @@ import type { Config } from '../config';
 import { abrirBanco, type Db } from '../db/connection';
 import { estadoDasMigracoes, listarMigracoes, migrar } from '../db/migrate';
 import { agora, todos } from '../db/util';
+import { operacaoIndivisivel } from '../encerramento';
 import { ErroDeValidacao, OperacaoNaoPermitida, RegistroNaoEncontrado } from '../erros';
 import { logger } from '../logger';
 import * as repo from '../repositories/sistema.repo';
@@ -94,7 +95,7 @@ function listarFotos(fotosDir: string): string[] {
 export function copiaPreMigracao(db: Db, config: Config): string {
   const nome = nomeLivre(config.backupsDir, `pre-migracao-${carimbo()}`, '.db');
   const destino = path.join(config.backupsDir, nome);
-  copiarBanco(db, destino);
+  operacaoIndivisivel(() => copiarBanco(db, destino));
   logger.info({ destino }, 'Cópia de segurança criada antes da migração.');
   return destino;
 }
@@ -104,6 +105,15 @@ export function criarBackup(
   config: Config,
   origem: OrigemBackup,
   prefixo = 'flor-de-pitanga',
+): BackupRegistro {
+  return operacaoIndivisivel(() => gerarBackup(db, config, origem, prefixo));
+}
+
+function gerarBackup(
+  db: Db,
+  config: Config,
+  origem: OrigemBackup,
+  prefixo: string,
 ): BackupRegistro {
   fs.mkdirSync(config.backupsDir, { recursive: true });
   const temp = path.join(config.backupsDir, `temp-${process.pid}-${Date.now()}.db`);
@@ -301,6 +311,14 @@ export function criarConexao(config: Config): Conexao {
  * e as fotos, reabre a conexão, aplica migrations pendentes e verifica a integridade.
  */
 export function restaurarBackup(
+  conexao: Conexao,
+  config: Config,
+  arquivo: string,
+): { integridade: string; migracoes: string[] } {
+  return operacaoIndivisivel(() => substituirPeloBackup(conexao, config, arquivo));
+}
+
+function substituirPeloBackup(
   conexao: Conexao,
   config: Config,
   arquivo: string,

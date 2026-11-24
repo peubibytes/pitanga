@@ -79,6 +79,8 @@ export interface Categoria {
   nome: string;
   tipo: TipoCategoria;
   ativo: boolean;
+  /** Quantos produtos ou materiais (ativos ou não) estão nesta categoria. */
+  emUso: number;
 }
 export interface Unidade {
   codigo: string;
@@ -111,6 +113,8 @@ export interface Material {
   custoMedio: number;
   ativo: boolean;
   estoqueBaixo: boolean;
+  /** Já tem movimentos de estoque ou entra em receitas: a unidade não muda pela edição comum. */
+  unidadeTravada: boolean;
 }
 export interface MovimentoMaterial {
   id: number;

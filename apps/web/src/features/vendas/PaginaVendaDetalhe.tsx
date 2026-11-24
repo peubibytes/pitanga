@@ -32,6 +32,7 @@ import {
   Tabela,
 } from '../../components/ui';
 import { api } from '../../lib/api';
+import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useItem, useMutacao } from '../../lib/query';
 import { tomDaVenda } from './PaginaVendas';
 
@@ -48,6 +49,7 @@ function ModalRecebimento({
   const f = useForm<{ data: string; valor: number | null; formaPagamento: FormaPagamento }>({
     values: { data: hojeISO(), valor: emAberto, formaPagamento: 'pix' },
   });
+  useAvisoDeSaida(aberto && f.formState.isDirty);
   const [erro, setErro] = useState<string | null>(null);
   const salvar = useMutacao(
     (d: { data: string; valor: number; formaPagamento: FormaPagamento }) =>

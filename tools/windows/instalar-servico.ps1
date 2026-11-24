@@ -1,5 +1,6 @@
 <#
-  Flor de Pitanga - inicia o aplicativo automaticamente ao entrar no Windows (opcional).
+  Flor de Pitanga - MODO SUPORTE: deixa a API rodando ao entrar no Windows, sem a janela do aplicativo.
+  Nao e necessario no uso normal: o icone "Flor de Pitanga" abre e encerra tudo sozinho.
   Cria uma tarefa agendada do usuario atual (nao precisa de administrador) que roda sem janela.
 
   Instalar:    powershell -ExecutionPolicy Bypass -File instalar-servico.ps1
@@ -14,7 +15,8 @@ if ($Remover) {
   exit 0
 }
 
-$pasta = Split-Path -Parent $MyInvocation.MyCommand.Path
+# O script fica em suporte\; runtime\ e app\ ficam ao lado dessa pasta.
+$pasta = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $node = Join-Path $pasta 'runtime\node.exe'
 if (-not (Test-Path $node)) { $node = 'node' }
 $principal = Join-Path $pasta 'app\apps\api\dist\main.js'
