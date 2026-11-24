@@ -17,7 +17,7 @@ A janela (Electron) sobe a API como processo filho, com o Node embutido e sem co
 
 ### Modo suporte (com console)
 
-Para diagnóstico, feche a janela e abra `suporte\iniciar.bat`, dentro da pasta do programa (`%LOCALAPPDATA%\Programs\<pasta do programa>\resources\suporte`): o servidor roda com console e o navegador abre em `http://127.0.0.1:1971`. `parar.bat` encerra. Se abrir o ícone com o modo suporte ligado, a janela usa o servidor que já está no ar e **não o encerra** ao fechar.
+Para diagnóstico, feche a janela e abra `suporte\iniciar.bat`, dentro da pasta do programa (`%LOCALAPPDATA%\Programs\flor-de-pitanga\resources\suporte`): o servidor roda com console e o navegador abre em `http://127.0.0.1:1971`. `parar.bat` encerra. Se abrir o ícone com o modo suporte ligado, a janela usa o servidor que já está no ar e **não o encerra** ao fechar.
 
 `npm run dist:win -- --sem-instalador` gera só a pasta portátil (`release/Flor de Pitanga/` e `.zip`), com os mesmos scripts em `suporte/`.
 
