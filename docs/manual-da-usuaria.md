@@ -4,7 +4,17 @@ Este guia usa a ordem em que o trabalho acontece no ateliê: cadastrar, comprar,
 
 ## 1. Abrindo o sistema
 
-O Flor de Pitanga roda só no seu computador, em `http://127.0.0.1:1971`, e não pede usuário nem senha: ao abrir, você já vê o **Painel**. O menu à esquerda leva a todas as telas; o botão _Recolher_ deixa só os ícones.
+**Para abrir:** dê dois cliques no ícone **Flor de Pitanga**, na Área de Trabalho ou no menu Iniciar. O programa abre em uma janela própria, direto no **Painel**, e não pede usuário nem senha. O menu à esquerda leva a todas as telas; o botão _Recolher_ deixa só os ícones.
+
+**Para sair:** feche a janela no **X**. Se você estiver no meio de um cadastro, o programa pergunta se quer voltar e salvar. Se houver um backup em andamento, ele termina antes de desligar.
+
+### Instalando pela primeira vez
+
+1. Dê dois cliques no arquivo **Flor-de-Pitanga-Instalador**. Não precisa de senha de administrador.
+2. O Windows pode mostrar uma tela azul: **"O Windows protegeu o computador"**. Isso acontece porque o programa não tem assinatura digital. Clique em **Mais informações** e depois no botão **Executar assim mesmo**.
+3. Espere a instalação terminar. O programa abre sozinho e o ícone aparece na Área de Trabalho.
+
+Para atualizar, é o mesmo caminho: feche o programa e execute o instalador novo. Seus dados continuam lá.
 
 ## 2. Cadastros
 
@@ -68,6 +78,8 @@ Lembre-se: **caixa negativo com lucro positivo é normal** — o dinheiro está 
 
 ## 10. Dúvidas frequentes
 
+**Apareceu "Outra versão do Flor de Pitanga já está aberta".** Feche a janela preta da versão antiga e clique em _Tentar de novo_.
+**Fechei a janela e o endereço no navegador parou de funcionar.** É assim mesmo: agora o programa usa a própria janela. Abra pelo ícone.
 **O custo de um material mudou sozinho.** É o custo médio: a cada compra ele é recalculado com o que você pagou.
 **Não consigo cancelar uma compra.** O material já foi usado em produção. Use um ajuste de estoque com justificativa.
 **Não consigo cancelar uma produção.** Parte das peças já foi vendida; cancele as vendas antes.

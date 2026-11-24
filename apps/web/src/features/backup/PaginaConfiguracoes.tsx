@@ -26,6 +26,7 @@ import {
   Tabela,
 } from '../../components/ui';
 import { api } from '../../lib/api';
+import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useAuth } from '../../lib/auth';
 import { useDados, useMutacao } from '../../lib/query';
 import { Categorias } from '../categorias/Categorias';
@@ -49,6 +50,7 @@ function Geral() {
       negativo: c?.permite_estoque_negativo === '1',
     },
   });
+  useAvisoDeSaida(f.formState.isDirty);
   const salvar = useMutacao(
     (d: { nome: string; valorHora: number | null; remunera: boolean; negativo: boolean }) =>
       api.put<Configuracoes>('/configuracoes', {
@@ -150,6 +152,7 @@ function Taxas() {
       ativo: t?.ativo ?? true,
     },
   });
+  useAvisoDeSaida(editando !== null && f.formState.isDirty);
   const tipo = f.watch('tipo');
   const [erro, setErro] = useState<string | null>(null);
   const salvar = useMutacao(

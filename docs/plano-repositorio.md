@@ -17,7 +17,7 @@ O documento de engenharia original ("Flor de Pitanga — Plano de Construção d
 | 9. Frontend                 | `apps/web/src/features/*` por funcionalidade; `components/ui`; `lib/api.ts` único; cálculo em tempo real com `@pitanga/core`; fontes e ícones empacotados; `pages/guia-de-estilo.tsx`.                                          |
 | 10. Backup e integridade    | `apps/api/src/backup/index.ts` (VACUUM INTO, integrity_check, manifesto com sha256, restauração com cópia prévia, retenção, rotina diária); CSV em `relatorios/`.                                                               |
 | 11. Testes                  | Vitest em todos os pacotes; Supertest; verificação das dez invariantes em teste e em `db:check`. Playwright: ver "Pendências".                                                                                                  |
-| 12. Empacotamento           | `tools/dist-win.mjs` (pasta portátil com Node embutido e teste de fumaça), `tools/windows/*`, `apps/desktop` (Electron).                                                                                                        |
+| 12. Empacotamento           | `tools/dist-win.mjs` (instalador, pasta com Node embutido e testes de fumaça), `tools/windows/*` (modo suporte), `apps/desktop` (Electron).                                                                                     |
 | 13. Riscos                  | Mitigações no código: recusa de pasta sincronizada, `engines`/`.nvmrc`, `GET /saude`, backup automático, redimensionamento de fotos, CLI de redefinição de senha.                                                               |
 | 14. Etapas 0–8              | Todas entregues (veja CHANGELOG). Etapa 9 (estabilização com uso real) depende de uso e fica aberta.                                                                                                                            |
 
@@ -37,6 +37,6 @@ O documento de engenharia original ("Flor de Pitanga — Plano de Construção d
 ## Pendências
 
 - **Playwright** (opcional, etapa 8): não implementado. O fluxo comprar → produzir → vender → receber está coberto por testes de API (Supertest) e foi verificado manualmente no navegador.
-- **Instalador `.exe`**: a casca Electron compila e tipa; a geração do instalador (`npm run dist:win -- --instalador`) depende do download dos binários do Electron/NSIS e não foi validada em máquina limpa. A **pasta portátil** foi gerada e passou no teste de fumaça.
+- **Instalador `.exe`**: gerado por `npm run dist:win` (e no CI), com teste de fumaça do conteúdo. Falta validar em Windows 11 limpo, com conta padrão.
 - **Validação em Windows 11 limpo**, treinamento das usuárias e etapa 9 dependem de pessoas e de uso real.
-- Assinatura digital do instalador (exige certificado).
+- Assinatura digital do instalador: dispensada pelo cliente (ADR 0007).

@@ -27,6 +27,7 @@ import {
   Selecao,
 } from '../../components/ui';
 import { ApiError, api } from '../../lib/api';
+import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useChaveIdempotencia, useMutacao } from '../../lib/query';
 
 interface VendaForm {
@@ -69,6 +70,7 @@ export default function PaginaVendaNova() {
       itens: [{ produtoId: null, quantidade: 1, precoUnitario: null, descontoItem: null }],
     },
   });
+  useAvisoDeSaida(f.formState.isDirty);
   const itens = useFieldArray({ control: f.control, name: 'itens' });
   const v = useWatch({ control: f.control });
 

@@ -26,6 +26,7 @@ import {
   PaginacaoControles,
 } from '../../components/ui';
 import { api, urlDaFoto } from '../../lib/api';
+import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useLista, useMutacao } from '../../lib/query';
 import { useDebounce } from '../../lib/util';
 
@@ -50,6 +51,7 @@ export function ModalProduto({
       ativo: produto?.ativo ?? true,
     },
   });
+  useAvisoDeSaida(aberto && f.formState.isDirty);
   const navegar = useNavigate();
   const salvar = useMutacao(
     (d: ProdutoEntrada) =>

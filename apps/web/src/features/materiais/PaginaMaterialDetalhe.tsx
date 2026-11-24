@@ -43,6 +43,7 @@ import {
   Tabela,
 } from '../../components/ui';
 import { api } from '../../lib/api';
+import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useDados, useItem, useLista, useMutacao } from '../../lib/query';
 import { ModalMaterial } from './PaginaMateriais';
 
@@ -70,6 +71,7 @@ function ModalAjuste({
   }>({
     values: { tipo: 'saida', quantidade: null, custoUnitario: null, justificativa: '' },
   });
+  useAvisoDeSaida(aberto && f.formState.isDirty);
   const tipo = f.watch('tipo');
   const salvar = useMutacao(
     (d: {

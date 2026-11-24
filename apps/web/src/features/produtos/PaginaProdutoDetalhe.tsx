@@ -42,6 +42,7 @@ import {
   Tabela,
 } from '../../components/ui';
 import { api } from '../../lib/api';
+import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useDados, useItem, useLista, useMutacao } from '../../lib/query';
 import { FotoDoProduto, ModalProduto } from './PaginaProdutos';
 
@@ -66,6 +67,7 @@ function ModalAjusteProduto({
     quantidade: number | null;
     justificativa: string;
   }>({ values: { tipo: 'saida', quantidade: null, justificativa: '' } });
+  useAvisoDeSaida(aberto && f.formState.isDirty);
   const [erro, setErro] = useState<string | null>(null);
   const salvar = useMutacao(
     (d: { tipo: 'entrada' | 'saida'; quantidade: number; justificativa: string }) =>
