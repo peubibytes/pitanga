@@ -87,13 +87,16 @@ function ModalAjuste({
       }),
     {
       sucesso: 'Ajuste registrado.',
-      aoConcluir: () => {
-        aoFechar();
-        f.reset();
-      },
+      naJanela: aberto,
+      aoConcluir: () => fechar(),
     },
   );
   const [erroLocal, setErroLocal] = useState<string | null>(null);
+  const fechar = () => {
+    f.reset();
+    setErroLocal(null);
+    aoFechar();
+  };
   const enviar = f.handleSubmit((d) => {
     const parse = ajusteEstoqueSchema.safeParse({
       tipo: d.tipo,
@@ -113,11 +116,12 @@ function ModalAjuste({
   return (
     <Modal
       aberto={aberto}
-      aoFechar={aoFechar}
+      aoFechar={fechar}
       titulo={`Ajustar estoque — ${material.nome}`}
+      erro={erroLocal ?? salvar.error}
       rodape={
         <>
-          <Botao onClick={aoFechar}>Cancelar</Botao>
+          <Botao onClick={fechar}>Cancelar</Botao>
           <Botao variante="primario" carregando={salvar.isPending} onClick={enviar}>
             Registrar ajuste
           </Botao>
@@ -129,7 +133,6 @@ function ModalAjuste({
           Use o ajuste para perdas, sobras e correções de contagem. Ele fica registrado com a
           justificativa e aparece no financeiro.
         </Alerta>
-        {erroLocal && <Alerta tom="pitanga">{erroLocal}</Alerta>}
         <p className="text-sm text-tinta-500">
           Estoque atual:{' '}
           <strong className="numero text-tinta-900">

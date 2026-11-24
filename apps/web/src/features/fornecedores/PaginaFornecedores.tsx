@@ -50,21 +50,27 @@ function ModalFornecedor({
         : api.post<Fornecedor>('/fornecedores', d),
     {
       sucesso: fornecedor ? 'Fornecedor atualizado.' : 'Fornecedor cadastrado.',
+      naJanela: aberto,
       aoConcluir: () => {
-        aoFechar();
-        f.reset();
+        fechar();
       },
     },
   );
+  /** Fechar descarta o que foi digitado: reabrir começa do que está salvo. */
+  const fechar = () => {
+    f.reset();
+    aoFechar();
+  };
   const e = f.formState.errors;
   return (
     <Modal
       aberto={aberto}
-      aoFechar={aoFechar}
+      aoFechar={fechar}
       titulo={fornecedor ? 'Editar fornecedor' : 'Novo fornecedor'}
+      erro={salvar.error}
       rodape={
         <>
-          <Botao onClick={aoFechar}>Cancelar</Botao>
+          <Botao onClick={fechar}>Cancelar</Botao>
           <Botao
             variante="primario"
             carregando={salvar.isPending}

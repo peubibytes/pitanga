@@ -27,7 +27,7 @@ import {
   Selecao,
   Tabela,
 } from '../../components/ui';
-import { ApiError, api, mensagemDoErro } from '../../lib/api';
+import { ApiError, api } from '../../lib/api';
 import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useMutacao } from '../../lib/query';
 
@@ -182,7 +182,7 @@ export function ModalTrocaUnidade({
   });
   const confirmar = useMutacao((corpo: TrocaUnidadeEntrada) => api.post<Material>(url, corpo), {
     sucesso: (m) => `Pronto: ${m.nome} agora é controlado em ${nomeDa(m.unidade).toLowerCase()}.`,
-    silencioso: true,
+    naJanela: true,
     aoConcluir: () => {
       // Receitas e estoque guardados de outras telas estão na unidade antiga: não podem reaparecer.
       qc.removeQueries({ type: 'inactive' });
@@ -219,6 +219,7 @@ export function ModalTrocaUnidade({
       aoFechar={aoFechar}
       titulo={`Trocar unidade — ${material.nome}`}
       tamanho="g"
+      erro={previa ? (verPrevia.error ?? confirmar.error) : verPrevia.error}
       rodape={
         previa ? (
           <>
@@ -259,7 +260,6 @@ export function ModalTrocaUnidade({
     >
       {!previa ? (
         <div className="space-y-4">
-          {verPrevia.isError && <Alerta tom="pitanga">{mensagemDoErro(verPrevia.error)}</Alerta>}
           <p className="text-sm text-tinta-600">
             Hoje este material é contado em{' '}
             <strong>{nomeDa(material.unidade).toLowerCase()}</strong> ({material.unidade}). Antes de
@@ -299,7 +299,6 @@ export function ModalTrocaUnidade({
         </div>
       ) : (
         <div className="space-y-5">
-          {confirmar.isError && <Alerta tom="pitanga">{mensagemDoErro(confirmar.error)}</Alerta>}
           <Tabela
             legenda="Como fica"
             linhas={LINHAS.map(([rotulo, valor]) => ({

@@ -160,12 +160,15 @@ function Taxas() {
       t ? api.put<Taxa>(`/taxas/${t.id}`, corpo) : api.post<Taxa>('/taxas', corpo),
     {
       sucesso: 'Taxa salva.',
-      aoConcluir: () => {
-        setEditando(null);
-        f.reset();
-      },
+      naJanela: editando !== null,
+      aoConcluir: () => fechar(),
     },
   );
+  const fechar = () => {
+    f.reset();
+    setErro(null);
+    setEditando(null);
+  };
   const enviar = f.handleSubmit((d) => {
     if (!d.nome.trim()) return setErro('Dê um nome à taxa.');
     if (d.valor === null) return setErro('Informe o valor.');
@@ -239,11 +242,12 @@ function Taxas() {
       </Cartao>
       <Modal
         aberto={editando !== null}
-        aoFechar={() => setEditando(null)}
+        aoFechar={fechar}
         titulo={t ? 'Editar taxa' : 'Nova taxa'}
+        erro={erro ?? salvar.error}
         rodape={
           <>
-            <Botao onClick={() => setEditando(null)}>Cancelar</Botao>
+            <Botao onClick={fechar}>Cancelar</Botao>
             <Botao variante="primario" carregando={salvar.isPending} onClick={enviar}>
               Salvar
             </Botao>
@@ -251,7 +255,6 @@ function Taxas() {
         }
       >
         <form className="space-y-4" onSubmit={enviar}>
-          {erro && <Alerta tom="pitanga">{erro}</Alerta>}
           <Campo rotulo="Nome" obrigatorio>
             {({ id }) => <Entrada id={id} autoFocus {...f.register('nome')} />}
           </Campo>

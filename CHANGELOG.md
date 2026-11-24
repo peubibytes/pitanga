@@ -4,6 +4,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) · versiona
 
 ## [Não lançado]
 
+### Corrigido
+
+- **Erros nas janelas:** quando a API recusa um salvamento, a mensagem aparece dentro da janela, logo acima dos botões, e é lida por leitor de tela (antes ficava atrás dela, e o botão parecia não fazer nada). Vale para todas as janelas: cadastros, ajustes de estoque, taxas, lançamentos, rateio, despesas, recebimentos, cancelamentos, produção com estoque negativo e backup. Se a janela já tiver sido fechada quando a resposta chegar, a mensagem vai para o aviso flutuante.
+- **Cancelar descarta o que foi digitado** também em clientes, produtos, fornecedores, ajustes, taxas, lançamentos, despesas, rateio e recebimentos: reabrir começa do que está salvo, sem o erro anterior.
+
 ### Pendente do plano
 
 - Roteiros fim a fim com Playwright (etapa 8, opcional).

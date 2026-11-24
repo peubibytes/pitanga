@@ -58,22 +58,28 @@ export function ModalProduto({
       produto ? api.put<Produto>(`/produtos/${produto.id}`, d) : api.post<Produto>('/produtos', d),
     {
       sucesso: produto ? 'Produto atualizado.' : 'Produto cadastrado. Agora monte a ficha técnica.',
+      naJanela: aberto,
       aoConcluir: (p) => {
-        aoFechar();
-        f.reset();
+        fechar();
         if (!produto) navegar(`/produtos/${p.id}`);
       },
     },
   );
+  /** Fechar descarta o que foi digitado: reabrir começa do que está salvo. */
+  const fechar = () => {
+    f.reset();
+    aoFechar();
+  };
   const e = f.formState.errors;
   return (
     <Modal
       aberto={aberto}
-      aoFechar={aoFechar}
+      aoFechar={fechar}
       titulo={produto ? 'Editar produto' : 'Novo produto'}
+      erro={salvar.error}
       rodape={
         <>
-          <Botao onClick={aoFechar}>Cancelar</Botao>
+          <Botao onClick={fechar}>Cancelar</Botao>
           <Botao
             variante="primario"
             carregando={salvar.isPending}

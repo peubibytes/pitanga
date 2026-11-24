@@ -74,12 +74,15 @@ function ModalAjusteProduto({
       api.post<Produto>(`/produtos/${produto.id}/ajuste`, d),
     {
       sucesso: 'Ajuste registrado.',
-      aoConcluir: () => {
-        aoFechar();
-        f.reset();
-      },
+      naJanela: aberto,
+      aoConcluir: () => fechar(),
     },
   );
+  const fechar = () => {
+    f.reset();
+    setErro(null);
+    aoFechar();
+  };
   const enviar = f.handleSubmit((d) => {
     if (!d.quantidade) return setErro('Informe a quantidade.');
     if (d.justificativa.trim().length < 3) return setErro('Explique o motivo do ajuste.');
@@ -89,11 +92,12 @@ function ModalAjusteProduto({
   return (
     <Modal
       aberto={aberto}
-      aoFechar={aoFechar}
+      aoFechar={fechar}
       titulo={`Ajustar estoque — ${produto.nome}`}
+      erro={erro ?? salvar.error}
       rodape={
         <>
-          <Botao onClick={aoFechar}>Cancelar</Botao>
+          <Botao onClick={fechar}>Cancelar</Botao>
           <Botao variante="primario" carregando={salvar.isPending} onClick={enviar}>
             Registrar ajuste
           </Botao>
@@ -101,7 +105,6 @@ function ModalAjusteProduto({
       }
     >
       <form className="space-y-4" onSubmit={enviar}>
-        {erro && <Alerta tom="pitanga">{erro}</Alerta>}
         <p className="text-sm text-tinta-500">
           Estoque atual: <strong className="text-tinta-900">{produto.estoqueAtual} un.</strong>
         </p>

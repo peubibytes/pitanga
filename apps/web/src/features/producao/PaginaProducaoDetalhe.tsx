@@ -32,6 +32,7 @@ export default function PaginaProducaoDetalhe() {
     () => api.post<Producao>(`/producoes/${id}/cancelar`, { motivo: motivo || null }),
     {
       sucesso: 'Produção cancelada: materiais devolvidos e peças retiradas do estoque.',
+      naJanela: cancelando,
       aoConcluir: () => setCancelando(false),
     },
   );
@@ -179,6 +180,7 @@ export default function PaginaProducaoDetalhe() {
         aoFechar={() => setCancelando(false)}
         aoConfirmar={() => cancelar.mutate(undefined)}
         carregando={cancelar.isPending}
+        erro={cancelar.error}
         titulo="Cancelar esta produção?"
         rotuloConfirmar="Cancelar produção"
         mensagem={

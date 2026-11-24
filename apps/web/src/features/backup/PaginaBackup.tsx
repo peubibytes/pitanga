@@ -59,6 +59,7 @@ export default function PaginaBackup() {
         confirmacao: 'RESTAURAR',
       }),
     {
+      naJanela: !!restaurando,
       aoConcluir: () => {
         setRestaurando(null);
         toast.sucesso('Backup restaurado. Vamos recarregar o aplicativo.');
@@ -69,6 +70,7 @@ export default function PaginaBackup() {
   );
   const excluir = useMutacao((arquivo: string) => api.delete(`/backup/${arquivo}`), {
     sucesso: 'Backup removido.',
+    naJanela: !!excluindo,
     aoConcluir: () => setExcluindo(null),
   });
   const importar = useMutacao(
@@ -290,6 +292,7 @@ export default function PaginaBackup() {
         aoFechar={() => setExcluindo(null)}
         aoConfirmar={() => excluindo && excluir.mutate(excluindo.arquivo)}
         carregando={excluir.isPending}
+        erro={excluir.error}
         perigo
         titulo="Remover este backup?"
         rotuloConfirmar="Remover backup"
@@ -305,6 +308,7 @@ export default function PaginaBackup() {
         aoFechar={() => setRestaurando(null)}
         aoConfirmar={() => restaurando && restaurar.mutate(restaurando.arquivo)}
         carregando={restaurar.isPending}
+        erro={restaurar.error}
         perigo
         palavraDeConfirmacao="RESTAURAR"
         titulo="Restaurar este backup?"
