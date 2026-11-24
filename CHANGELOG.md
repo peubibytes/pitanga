@@ -4,6 +4,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) · versiona
 
 ## [Não lançado]
 
+### Pendente do plano
+
+- Roteiros fim a fim com Playwright (etapa 8, opcional).
+- Etapa 9 (estabilização com uso real): registrar aqui os ajustes depois dos primeiros fechamentos de mês.
+
+## [0.2.0] — 2026-11-24
+
+Instalador com janela própria, edição de materiais, troca de unidade e gestão de categorias. Sem migrations: o banco da 0.1.0 é reconhecido como está.
+
 ### Alterado
 
 - **Pacote do Windows:** `iniciar.bat`, `parar.bat` e `instalar-servico.ps1` saem da raiz e ficam em `suporte/` (modo suporte, com console). A opção `--instalador` virou padrão; use `--sem-instalador` para gerar só a pasta portátil.
@@ -24,11 +33,6 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) · versiona
 - **Unidade do material:** a API recusa trocar a unidade também quando o material é usado em receitas (antes, 250 ml viravam 250 un em silêncio). A tela só trava a unidade quando a API travaria.
 - **Janelas:** ao abrir, o foco vai para o primeiro campo (antes ia para o "X"); Esc fecha só a janela de cima.
 - Tabelas: Enter em um botão da linha não abre mais o detalhe da linha.
-
-### Pendente do plano
-
-- Roteiros fim a fim com Playwright (etapa 8, opcional).
-- Etapa 9 (estabilização com uso real): registrar aqui os ajustes depois dos primeiros fechamentos de mês.
 
 ## [0.1.0] — primeira construção do repositório
 
