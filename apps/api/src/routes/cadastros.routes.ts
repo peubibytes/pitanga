@@ -63,6 +63,13 @@ export function cadastrosRoutes(deps: Dependencias): Router {
   r.post('/categorias', (req, res) =>
     ok(res, cadastros.criarCategoria(ctxDe(deps, req), req.body), 201),
   );
+  r.put('/categorias/:id', (req, res) =>
+    ok(res, cadastros.renomearCategoria(ctxDe(deps, req), idDe(req), req.body)),
+  );
+  r.delete('/categorias/:id', (req, res) => {
+    const { moverPara } = z.object({ moverPara: consulta.inteiroOpcional }).parse(req.query);
+    ok(res, cadastros.removerCategoria(ctxDe(deps, req), idDe(req), moverPara));
+  });
   r.get('/unidades', (req, res) => ok(res, cadastros.listarUnidades(ctxDe(deps, req))));
 
   /* ----------------------------------- taxas ----------------------------------- */

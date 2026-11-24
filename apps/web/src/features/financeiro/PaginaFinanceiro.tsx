@@ -51,6 +51,7 @@ import {
   Tabela,
 } from '../../components/ui';
 import { api } from '../../lib/api';
+import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useDados, useLista, useMutacao } from '../../lib/query';
 import { classeValor, useDebounce, type Periodo } from '../../lib/util';
 
@@ -74,6 +75,7 @@ function ModalLancamento({ aberto, aoFechar }: { aberto: boolean; aoFechar: () =
       dataCaixa: hojeISO(),
     },
   });
+  useAvisoDeSaida(aberto && f.formState.isDirty);
   const [erro, setErro] = useState<string | null>(null);
   const natureza = f.watch('natureza');
   const pago = f.watch('pago');
@@ -595,6 +597,7 @@ function ModalRateio({
       })),
   ];
   const manual = despesa?.criterio === 'manual';
+  useAvisoDeSaida(!!despesa && Object.keys(valores).length > 0);
   const escolhidos = destinos.filter((d) => valores[d.chave] !== undefined);
   const soma = escolhidos.reduce((s, d) => s + (valores[d.chave] ?? 0), 0);
   const ratear = useMutacao(
@@ -738,6 +741,7 @@ function Compartilhadas() {
       formaPagamento: 'pix',
     },
   });
+  useAvisoDeSaida(nova && f.formState.isDirty);
   const [erro, setErro] = useState<string | null>(null);
   const criar = useMutacao(
     (corpo: object) => api.post<DespesaCompartilhada>('/despesas-compartilhadas', corpo),

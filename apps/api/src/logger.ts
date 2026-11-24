@@ -7,6 +7,17 @@ export let logger: Logger = pino({
   level: process.env.FDP_LOG_LEVEL ?? (process.env.NODE_ENV === 'test' ? 'silent' : 'info'),
 });
 
+let arquivoDeLog: { flushSync?: () => void } | null = null;
+
+/** Grava o que ainda estiver na memória; chamar antes de `process.exit`. */
+export function descarregarLog(): void {
+  try {
+    arquivoDeLog?.flushSync?.();
+  } catch {
+    /* arquivo ainda não aberto: nada a gravar */
+  }
+}
+
 export async function iniciarLogger(config: Config): Promise<Logger> {
   if (process.env.NODE_ENV === 'test') return logger;
   try {
@@ -19,6 +30,7 @@ export async function iniciarLogger(config: Config): Promise<Logger> {
       mkdir: true,
       limit: { count: 14 },
     });
+    arquivoDeLog = arquivo as { flushSync?: () => void };
     logger = pino(
       { level: 'info' },
       pino.multistream([{ stream: process.stdout }, { stream: arquivo }]),

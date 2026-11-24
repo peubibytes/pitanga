@@ -32,6 +32,7 @@ import {
   Tabela,
 } from '../../components/ui';
 import { api, mensagemDoErro } from '../../lib/api';
+import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useLista, useMutacao } from '../../lib/query';
 import { useDebounce } from '../../lib/util';
 
@@ -56,6 +57,7 @@ export function ModalMaterial({
       ativo: material?.ativo ?? true,
     },
   });
+  useAvisoDeSaida(aberto && f.formState.isDirty);
   const unidade = f.watch('unidade');
   const travada = material?.unidadeTravada ?? false;
   const navegar = useNavigate();
@@ -115,6 +117,7 @@ export function ModalMaterial({
                   <SeletorCategoria
                     id={id}
                     tipo="material"
+                    permitirNova
                     valor={field.value ?? null}
                     onChange={field.onChange}
                   />

@@ -26,7 +26,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "typecheck": "npm run typecheck --workspaces --if-present && tsc -p tools/tsconfig.json",
-    "dist:win": "node tools/dist-win.mjs"
+    "dist:win": "node tools/dist-win.mjs",
+    "icone": "node tools/gerar-icone.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

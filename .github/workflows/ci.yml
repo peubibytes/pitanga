@@ -25,3 +25,25 @@ jobs:
           npm run db:check
         env:
           FDP_DATA_DIR: ${{ runner.temp }}\fdp-dados
+
+  instalador:
+    needs: qualidade
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc # o Node embutido no instalador é este
+          cache: npm
+      - run: npm ci
+      - name: Instalador do Windows
+        run: npm run dist:win
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false' # sem assinatura de código (ADR 0007)
+      - uses: actions/upload-artifact@v4
+        with:
+          name: instalador-windows
+          path: |
+            release/instalador/*.exe
+            release/instalador/LEIA-ME.txt
+          if-no-files-found: error

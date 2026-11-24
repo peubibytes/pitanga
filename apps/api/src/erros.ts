@@ -46,6 +46,18 @@ export class OperacaoNaoPermitida extends ErroDeDominio {
   }
 }
 
+/** Remover uma categoria com itens exige dizer para onde eles vão. */
+export class CategoriaEmUso extends ErroDeDominio {
+  constructor(nome: string, itens: number) {
+    super(
+      'CATEGORIA_EM_USO',
+      `A categoria "${nome}" tem ${itens} ${itens === 1 ? 'item' : 'itens'}. Escolha para qual categoria movê-los antes de remover.`,
+      409,
+      { itens },
+    );
+  }
+}
+
 export class NaoAutenticado extends ErroDeDominio {
   constructor(mensagem = 'Entre com seu usuário e senha para continuar.') {
     super('NAO_AUTENTICADO', mensagem, 401);

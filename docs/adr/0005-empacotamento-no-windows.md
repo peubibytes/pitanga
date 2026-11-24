@@ -1,6 +1,6 @@
 # ADR 0005 — Empacotamento no Windows
 
-**Status:** aceita
+**Status:** aceita; a Fase 2 virou o entregável padrão na [ADR 0007](0007-abertura-sem-terminal.md)
 
 ## Contexto
 
