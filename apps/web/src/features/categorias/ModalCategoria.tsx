@@ -2,8 +2,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { categoriaSchema, type Categoria, type TipoCategoria } from '@pitanga/shared';
 import { createPortal } from 'react-dom';
-import { Alerta, Botao, Campo, Entrada, Modal } from '../../components/ui';
-import { api, mensagemDoErro } from '../../lib/api';
+import { Botao, Campo, Entrada, Modal } from '../../components/ui';
+import { api } from '../../lib/api';
 import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useMutacao } from '../../lib/query';
 
@@ -33,7 +33,7 @@ export function ModalCategoria({
         : api.post<Categoria>('/categorias', { nome, tipo }),
     {
       sucesso: categoria ? 'Categoria renomeada.' : 'Categoria criada.',
-      silencioso: true,
+      naJanela: aberto,
       aoConcluir: (c) => {
         fechar();
         aoSalvar?.(c);
@@ -42,7 +42,6 @@ export function ModalCategoria({
   );
   const fechar = () => {
     f.reset();
-    salvar.reset();
     aoFechar();
   };
   const enviar = f.handleSubmit((d) => salvar.mutate(d));
@@ -54,6 +53,7 @@ export function ModalCategoria({
       aoFechar={fechar}
       titulo={categoria ? 'Renomear categoria' : 'Nova categoria'}
       tamanho="p"
+      erro={salvar.error}
       rodape={
         <>
           <Botao onClick={fechar}>Cancelar</Botao>
@@ -70,7 +70,6 @@ export function ModalCategoria({
           void enviar(e);
         }}
       >
-        {salvar.isError && <Alerta tom="pitanga">{mensagemDoErro(salvar.error)}</Alerta>}
         <Campo
           rotulo="Nome da categoria"
           dica={tipo === 'produto' ? 'Ex.: Caixas para pintar' : 'Ex.: Gesso e tintas'}

@@ -6,7 +6,7 @@ import {
   keepPreviousData,
 } from '@tanstack/react-query';
 import type { Paginacao } from '@pitanga/shared';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { api, mensagemDoErro, ApiError } from './api';
 import { useToast } from '../components/ui/toast';
 
@@ -62,6 +62,10 @@ export type ListaResultado<T> = { itens: T[]; paginacao: Paginacao };
 /**
  * Mutação com aviso de sucesso/erro. Depois de gravar, invalida tudo: registrar uma venda altera
  * produtos, financeiro e painel — numa base pequena e local, rebuscar o que está na tela é barato.
+ *
+ * `naJanela`: para mutações disparadas de uma janela, diga se ela está aberta e passe `error` ao
+ * `erro` do `Modal`. O aviso flutuante só aparece se a janela já tiver sido fechada, e o erro some
+ * ao fechar ou reabrir. `silencioso`: a tela sempre mostra o erro por conta própria.
  */
 export function useMutacao<E, S>(
   fn: (entrada: E) => Promise<S>,
@@ -69,11 +73,15 @@ export function useMutacao<E, S>(
     sucesso?: string | ((s: S) => string);
     aoConcluir?: (s: S) => void;
     silencioso?: boolean;
+    naJanela?: boolean;
   } = {},
 ) {
   const qc = useQueryClient();
   const toast = useToast();
-  return useMutation({
+  const { naJanela = false } = opcoes;
+  // Em ref: a resposta pode chegar depois de a janela fechar (ou sair da tela).
+  const janelaAberta = useRef(false);
+  const mutacao = useMutation({
     mutationFn: fn,
     onSuccess: async (s) => {
       await qc.invalidateQueries();
@@ -82,9 +90,19 @@ export function useMutacao<E, S>(
       opcoes.aoConcluir?.(s);
     },
     onError: (e) => {
-      if (!opcoes.silencioso) toast.erro(mensagemDoErro(e));
+      if (!opcoes.silencioso && !janelaAberta.current) toast.erro(mensagemDoErro(e));
     },
   });
+  useEffect(() => {
+    janelaAberta.current = naJanela;
+    // Só com erro: limpar um envio em andamento liberaria um segundo envio ao reabrir.
+    if (mutacao.isError) mutacao.reset();
+    return () => {
+      janelaAberta.current = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [naJanela]);
+  return mutacao;
 }
 
 /**

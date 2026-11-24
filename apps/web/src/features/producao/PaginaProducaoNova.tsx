@@ -78,6 +78,7 @@ export default function PaginaProducaoNova() {
     {
       sucesso: (p) =>
         `Lote #${p.id} registrado: materiais baixados e ${p.quantidade} peças em estoque.`,
+      naJanela: forcar,
       aoConcluir: (p) => {
         chave.renovar();
         navegar(`/producao/${p.id}`);
@@ -299,6 +300,7 @@ export default function PaginaProducaoNova() {
         aoFechar={() => setForcar(false)}
         aoConfirmar={() => registrar.mutate(true)}
         carregando={registrar.isPending}
+        erro={registrar.error}
         perigo
         titulo="Produzir com estoque negativo?"
         rotuloConfirmar="Produzir mesmo assim"

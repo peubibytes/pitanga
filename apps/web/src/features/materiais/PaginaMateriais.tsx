@@ -18,7 +18,6 @@ import type { z } from 'zod';
 import { PaginaCabecalho } from '../../components/layout/PaginaCabecalho';
 import { SeletorCategoria } from '../../components/selecionadores';
 import {
-  Alerta,
   Botao,
   Campo,
   Cartao,
@@ -31,7 +30,7 @@ import {
   Selecao,
   Tabela,
 } from '../../components/ui';
-import { api, mensagemDoErro } from '../../lib/api';
+import { api } from '../../lib/api';
 import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useLista, useMutacao } from '../../lib/query';
 import { useDebounce } from '../../lib/util';
@@ -70,8 +69,7 @@ export function ModalMaterial({
         : api.post<Material>('/materiais', d),
     {
       sucesso: material ? 'Material atualizado.' : 'Material cadastrado.',
-      // O erro aparece dentro da janela: o aviso flutuante fica atrás dela.
-      silencioso: true,
+      naJanela: aberto,
       aoConcluir: (m) => {
         fechar();
         if (!material) navegar(`/materiais/${m.id}`);
@@ -81,7 +79,6 @@ export function ModalMaterial({
   /** Fechar descarta o que foi digitado: reabrir começa do que está salvo. */
   const fechar = () => {
     f.reset();
-    salvar.reset();
     aoFechar();
   };
   const e = f.formState.errors;
@@ -91,6 +88,7 @@ export function ModalMaterial({
       aberto={aberto}
       aoFechar={fechar}
       titulo={material ? 'Editar material' : 'Novo material'}
+      erro={salvar.error}
       rodape={
         <>
           <Botao onClick={fechar}>Cancelar</Botao>
@@ -105,7 +103,6 @@ export function ModalMaterial({
       }
     >
       <form className="space-y-4" onSubmit={f.handleSubmit((d) => salvar.mutate(d))}>
-        {salvar.isError && <Alerta tom="pitanga">{mensagemDoErro(salvar.error)}</Alerta>}
         <Campo rotulo="Nome" erro={e.nome?.message} obrigatorio>
           {({ id }) => <Entrada id={id} autoFocus {...f.register('nome')} />}
         </Campo>

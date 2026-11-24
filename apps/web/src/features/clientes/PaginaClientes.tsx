@@ -57,22 +57,28 @@ export function ModalCliente({
       cliente ? api.put<Cliente>(`/clientes/${cliente.id}`, d) : api.post<Cliente>('/clientes', d),
     {
       sucesso: cliente ? 'Cliente atualizado.' : 'Cliente cadastrado.',
+      naJanela: aberto,
       aoConcluir: (c) => {
-        aoFechar();
-        f.reset();
+        fechar();
         if (!cliente) navegar(`/clientes/${c.id}`);
       },
     },
   );
+  /** Fechar descarta o que foi digitado: reabrir começa do que está salvo. */
+  const fechar = () => {
+    f.reset();
+    aoFechar();
+  };
   const e = f.formState.errors;
   return (
     <Modal
       aberto={aberto}
-      aoFechar={aoFechar}
+      aoFechar={fechar}
       titulo={cliente ? 'Editar cliente' : 'Novo cliente'}
+      erro={salvar.error}
       rodape={
         <>
-          <Botao onClick={aoFechar}>Cancelar</Botao>
+          <Botao onClick={fechar}>Cancelar</Botao>
           <Botao
             variante="primario"
             carregando={salvar.isPending}

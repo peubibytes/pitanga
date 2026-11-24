@@ -89,12 +89,15 @@ function ModalLancamento({ aberto, aoFechar }: { aberto: boolean; aoFechar: () =
     (corpo: object) => api.post<Lancamento>('/financeiro/lancamentos', corpo),
     {
       sucesso: 'Lançamento registrado.',
-      aoConcluir: () => {
-        aoFechar();
-        f.reset();
-      },
+      naJanela: aberto,
+      aoConcluir: () => fechar(),
     },
   );
+  const fechar = () => {
+    f.reset();
+    setErro(null);
+    aoFechar();
+  };
   const enviar = f.handleSubmit((d) => {
     if (d.descricao.trim().length === 0) return setErro('Descreva o lançamento.');
     if (!d.valor) return setErro('Informe o valor.');
@@ -117,11 +120,12 @@ function ModalLancamento({ aberto, aoFechar }: { aberto: boolean; aoFechar: () =
   return (
     <Modal
       aberto={aberto}
-      aoFechar={aoFechar}
+      aoFechar={fechar}
       titulo="Novo lançamento"
+      erro={erro ?? salvar.error}
       rodape={
         <>
-          <Botao onClick={aoFechar}>Cancelar</Botao>
+          <Botao onClick={fechar}>Cancelar</Botao>
           <Botao variante="primario" carregando={salvar.isPending} onClick={enviar}>
             Registrar
           </Botao>
@@ -129,7 +133,6 @@ function ModalLancamento({ aberto, aoFechar }: { aberto: boolean; aoFechar: () =
       }
     >
       <form className="space-y-4" onSubmit={enviar}>
-        {erro && <Alerta tom="pitanga">{erro}</Alerta>}
         <Campo rotulo="Tipo">
           {({ id }) => (
             <Selecao id={id} {...f.register('natureza')}>
@@ -215,11 +218,23 @@ function Extrato({ periodo }: { periodo: Periodo }) {
   });
   const realizar = useMutacao(
     () => api.post(`/financeiro/lancamentos/${realizando!.id}/realizar`, { dataCaixa }),
-    { sucesso: 'Lançamento realizado.', aoConcluir: () => setRealizando(null) },
+    {
+      sucesso: 'Lançamento realizado.',
+      naJanela: !!realizando,
+      aoConcluir: () => fecharRealizar(),
+    },
   );
+  const fecharRealizar = () => {
+    setDataCaixa(hojeISO());
+    setRealizando(null);
+  };
   const cancelar = useMutacao(
     () => api.post(`/financeiro/lancamentos/${cancelando!.id}/cancelar`),
-    { sucesso: 'Lançamento cancelado.', aoConcluir: () => setCancelando(null) },
+    {
+      sucesso: 'Lançamento cancelado.',
+      naJanela: !!cancelando,
+      aoConcluir: () => setCancelando(null),
+    },
   );
 
   return (
@@ -343,12 +358,13 @@ function Extrato({ periodo }: { periodo: Periodo }) {
       <ModalLancamento aberto={novo} aoFechar={() => setNovo(false)} />
       <Modal
         aberto={!!realizando}
-        aoFechar={() => setRealizando(null)}
+        aoFechar={fecharRealizar}
         titulo="Marcar como realizado"
         tamanho="p"
+        erro={realizar.error}
         rodape={
           <>
-            <Botao onClick={() => setRealizando(null)}>Voltar</Botao>
+            <Botao onClick={fecharRealizar}>Voltar</Botao>
             <Botao
               variante="primario"
               carregando={realizar.isPending}
@@ -368,6 +384,7 @@ function Extrato({ periodo }: { periodo: Periodo }) {
         aoFechar={() => setCancelando(null)}
         aoConfirmar={() => cancelar.mutate(undefined)}
         carregando={cancelar.isPending}
+        erro={cancelar.error}
         titulo="Cancelar lançamento?"
         rotuloConfirmar="Cancelar lançamento"
         mensagem={
@@ -611,12 +628,15 @@ function ModalRateio({
       }),
     {
       sucesso: 'Despesa rateada.',
-      aoConcluir: () => {
-        setValores({});
-        aoFechar();
-      },
+      naJanela: !!despesa,
+      aoConcluir: () => fechar(),
     },
   );
+  const fechar = () => {
+    setValores({});
+    setErro(null);
+    aoFechar();
+  };
   if (!despesa) return null;
   const confirmar = () => {
     if (escolhidos.length === 0) return setErro('Escolha ao menos um destino.');
@@ -630,12 +650,13 @@ function ModalRateio({
   return (
     <Modal
       aberto
-      aoFechar={aoFechar}
+      aoFechar={fechar}
       titulo={`Ratear: ${despesa.descricao}`}
       tamanho="g"
+      erro={erro ?? ratear.error}
       rodape={
         <>
-          <Botao onClick={aoFechar}>Cancelar</Botao>
+          <Botao onClick={fechar}>Cancelar</Botao>
           <Botao variante="primario" carregando={ratear.isPending} onClick={confirmar}>
             Ratear
           </Botao>
@@ -648,7 +669,6 @@ function ModalRateio({
           Para “produto”, o valor entra no custo da próxima produção; para “lote”, soma ao custo de
           um lote já produzido.
         </Alerta>
-        {erro && <Alerta tom="pitanga">{erro}</Alerta>}
         <p className="text-sm text-tinta-600">
           Valor da despesa: <strong className="numero">{formatarMoeda(despesa.valorTotal)}</strong>{' '}
           · critério:{' '}
@@ -747,16 +767,25 @@ function Compartilhadas() {
     (corpo: object) => api.post<DespesaCompartilhada>('/despesas-compartilhadas', corpo),
     {
       sucesso: 'Despesa registrada. Agora distribua o custo entre os produtos.',
+      naJanela: nova,
       aoConcluir: (d) => {
-        setNova(false);
-        f.reset();
+        fecharNova();
         setRatear(d);
       },
     },
   );
+  const fecharNova = () => {
+    f.reset();
+    setErro(null);
+    setNova(false);
+  };
   const cancelar = useMutacao(
     () => api.post(`/despesas-compartilhadas/${cancelando!.id}/cancelar`),
-    { sucesso: 'Despesa cancelada e pagamento estornado.', aoConcluir: () => setCancelando(null) },
+    {
+      sucesso: 'Despesa cancelada e pagamento estornado.',
+      naJanela: !!cancelando,
+      aoConcluir: () => setCancelando(null),
+    },
   );
   const enviar = f.handleSubmit((d) => {
     if (!d.descricao.trim()) return setErro('Descreva a despesa.');
@@ -863,11 +892,12 @@ function Compartilhadas() {
       </div>
       <Modal
         aberto={nova}
-        aoFechar={() => setNova(false)}
+        aoFechar={fecharNova}
         titulo="Nova despesa compartilhada"
+        erro={erro ?? criar.error}
         rodape={
           <>
-            <Botao onClick={() => setNova(false)}>Cancelar</Botao>
+            <Botao onClick={fecharNova}>Cancelar</Botao>
             <Botao variante="primario" carregando={criar.isPending} onClick={enviar}>
               Registrar
             </Botao>
@@ -875,7 +905,6 @@ function Compartilhadas() {
         }
       >
         <form className="space-y-4" onSubmit={enviar}>
-          {erro && <Alerta tom="pitanga">{erro}</Alerta>}
           <Campo rotulo="Descrição" obrigatorio>
             {({ id }) => <Entrada id={id} autoFocus {...f.register('descricao')} />}
           </Campo>
@@ -943,6 +972,7 @@ function Compartilhadas() {
         aoFechar={() => setCancelando(null)}
         aoConfirmar={() => cancelar.mutate(undefined)}
         carregando={cancelar.isPending}
+        erro={cancelar.error}
         titulo="Cancelar despesa?"
         rotuloConfirmar="Cancelar despesa"
         mensagem={

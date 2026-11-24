@@ -3,6 +3,8 @@ import { useEffect, useId, useRef, useState, type ReactNode } from 'react';
 import { clsx } from 'clsx';
 import { Botao } from './botao';
 import { Entrada } from './campo';
+import { Alerta } from './estados';
+import { mensagemDoErro } from '../../lib/api';
 
 interface ModalProps {
   aberto: boolean;
@@ -11,10 +13,23 @@ interface ModalProps {
   children: ReactNode;
   rodape?: ReactNode;
   tamanho?: 'p' | 'm' | 'g';
+  /**
+   * Por que não deu para salvar: o erro da mutação ou um texto pronto. Fica acima dos botões, fora da
+   * área de rolagem. Um aviso flutuante não serve: a janela cobre o resto da tela e o deixa inerte.
+   */
+  erro?: unknown;
 }
 
 /** Janela modal sobre o elemento <dialog>: foco preso, ESC fecha, leitores de tela anunciam o título. */
-export function Modal({ aberto, aoFechar, titulo, children, rodape, tamanho = 'm' }: ModalProps) {
+export function Modal({
+  aberto,
+  aoFechar,
+  titulo,
+  children,
+  rodape,
+  tamanho = 'm',
+  erro,
+}: ModalProps) {
   const ref = useRef<HTMLDialogElement>(null);
   // Id próprio: uma janela pode abrir sobre outra (ex.: nova categoria dentro de um cadastro).
   const tituloId = useId();
@@ -65,6 +80,13 @@ export function Modal({ aberto, aoFechar, titulo, children, rodape, tamanho = 'm
           <div data-conteudo className="overflow-y-auto p-5">
             {children}
           </div>
+          {!!erro && (
+            <div className="border-t border-creme-200 px-5 py-3">
+              <Alerta tom="pitanga">
+                {typeof erro === 'string' ? erro : mensagemDoErro(erro)}
+              </Alerta>
+            </div>
+          )}
           {rodape && (
             <footer className="flex justify-end gap-2 border-t border-creme-200 bg-creme-50 px-5 py-3">
               {rodape}
@@ -85,6 +107,8 @@ interface ConfirmarProps {
   rotuloConfirmar?: string;
   perigo?: boolean;
   carregando?: boolean;
+  /** Ver `erro` em `Modal`. */
+  erro?: unknown;
   /** Exige digitar esta palavra para habilitar a confirmação (operações destrutivas). */
   palavraDeConfirmacao?: string;
 }
@@ -98,6 +122,7 @@ export function Confirmar({
   rotuloConfirmar = 'Confirmar',
   perigo,
   carregando,
+  erro,
   palavraDeConfirmacao,
 }: ConfirmarProps) {
   const [digitado, setDigitado] = useState('');
@@ -111,6 +136,7 @@ export function Confirmar({
       aoFechar={aoFechar}
       titulo={titulo}
       tamanho="p"
+      erro={erro}
       rodape={
         <>
           <Botao onClick={aoFechar}>Voltar</Botao>

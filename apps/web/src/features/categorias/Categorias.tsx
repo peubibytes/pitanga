@@ -13,7 +13,7 @@ import {
   Modal,
   Tabela,
 } from '../../components/ui';
-import { api, mensagemDoErro } from '../../lib/api';
+import { api } from '../../lib/api';
 import { useMutacao } from '../../lib/query';
 import { ModalCategoria } from './ModalCategoria';
 
@@ -31,7 +31,7 @@ function ModalRemover({ categoria, aoFechar }: { categoria: Categoria; aoFechar:
   const remover = useMutacao(
     () =>
       api.delete(`/categorias/${categoria.id}${destino !== null ? `?moverPara=${destino}` : ''}`),
-    { sucesso: 'Categoria removida.', silencioso: true, aoConcluir: aoFechar },
+    { sucesso: 'Categoria removida.', naJanela: true, aoConcluir: aoFechar },
   );
   return (
     <Modal
@@ -39,6 +39,7 @@ function ModalRemover({ categoria, aoFechar }: { categoria: Categoria; aoFechar:
       aoFechar={aoFechar}
       titulo={`Remover "${categoria.nome}"?`}
       tamanho="p"
+      erro={remover.error}
       rodape={
         <>
           <Botao onClick={aoFechar}>Voltar</Botao>
@@ -54,7 +55,6 @@ function ModalRemover({ categoria, aoFechar }: { categoria: Categoria; aoFechar:
       }
     >
       <div className="space-y-4 text-sm text-tinta-600">
-        {remover.isError && <Alerta tom="pitanga">{mensagemDoErro(remover.error)}</Alerta>}
         {!comItens && <p>Nenhum item usa esta categoria. Ela some das listas de escolha.</p>}
         {semDestinoPossivel && (
           <Alerta tom="ambar">

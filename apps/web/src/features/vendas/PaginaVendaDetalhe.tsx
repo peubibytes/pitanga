@@ -56,9 +56,15 @@ function ModalRecebimento({
       api.post<Venda>(`/vendas/${venda.id}/recebimentos`, d),
     {
       sucesso: 'Recebimento registrado.',
-      aoConcluir: aoFechar,
+      naJanela: aberto,
+      aoConcluir: () => fechar(),
     },
   );
+  const fechar = () => {
+    f.reset();
+    setErro(null);
+    aoFechar();
+  };
   const enviar = f.handleSubmit((d) => {
     if (!d.valor) return setErro('Informe o valor recebido.');
     if (d.valor > emAberto)
@@ -69,12 +75,13 @@ function ModalRecebimento({
   return (
     <Modal
       aberto={aberto}
-      aoFechar={aoFechar}
+      aoFechar={fechar}
       titulo="Registrar recebimento"
       tamanho="p"
+      erro={erro ?? salvar.error}
       rodape={
         <>
-          <Botao onClick={aoFechar}>Cancelar</Botao>
+          <Botao onClick={fechar}>Cancelar</Botao>
           <Botao variante="primario" carregando={salvar.isPending} onClick={enviar}>
             Registrar
           </Botao>
@@ -82,7 +89,6 @@ function ModalRecebimento({
       }
     >
       <form className="space-y-4" onSubmit={enviar}>
-        {erro && <Alerta tom="pitanga">{erro}</Alerta>}
         <p className="text-sm text-tinta-600">
           Falta receber <strong className="numero">{formatarMoeda(emAberto)}</strong>. O recebimento
           entra no caixa; a receita da venda já foi contada no dia da venda.
@@ -138,6 +144,7 @@ export default function PaginaVendaDetalhe() {
     () => api.post<Venda>(`/vendas/${id}/cancelar`, { motivo: motivo || null }),
     {
       sucesso: 'Venda cancelada: estoque devolvido e valores estornados.',
+      naJanela: cancelando,
       aoConcluir: () => setCancelando(false),
     },
   );
@@ -340,6 +347,7 @@ export default function PaginaVendaDetalhe() {
         aoFechar={() => setCancelando(false)}
         aoConfirmar={() => cancelar.mutate(undefined)}
         carregando={cancelar.isPending}
+        erro={cancelar.error}
         titulo="Cancelar esta venda?"
         rotuloConfirmar="Cancelar venda"
         mensagem={

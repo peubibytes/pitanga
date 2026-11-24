@@ -35,6 +35,7 @@ export default function PaginaCompraDetalhe() {
     () => api.post<Compra>(`/compras/${id}/cancelar`, { motivo: motivo || null }),
     {
       sucesso: 'Compra cancelada. O estoque e o caixa foram estornados.',
+      naJanela: cancelando,
       aoConcluir: () => setCancelando(false),
     },
   );
@@ -180,6 +181,7 @@ export default function PaginaCompraDetalhe() {
         aoFechar={() => setCancelando(false)}
         aoConfirmar={() => cancelar.mutate(undefined)}
         carregando={cancelar.isPending}
+        erro={cancelar.error}
         titulo="Cancelar esta compra?"
         rotuloConfirmar="Cancelar compra"
         mensagem={
