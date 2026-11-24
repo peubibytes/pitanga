@@ -27,6 +27,7 @@ import {
   Tabela,
 } from '../../components/ui';
 import { ApiError, api } from '../../lib/api';
+import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useChaveIdempotencia, useMutacao } from '../../lib/query';
 import { useDebounce } from '../../lib/util';
 
@@ -43,6 +44,10 @@ export default function PaginaProducaoNova() {
   const [forcar, setForcar] = useState(false);
   const [justificativa, setJustificativa] = useState('');
   const qtd = useDebounce(quantidade ?? 0, 250);
+  const inicial = params.get('produto') ? Number(params.get('produto')) : null;
+  useAvisoDeSaida(
+    produtoId !== inicial || quantidade !== 1 || observacao !== '' || justificativa !== '',
+  );
 
   const simulacao = useQuery({
     queryKey: ['simulacao-producao', produtoId, qtd],

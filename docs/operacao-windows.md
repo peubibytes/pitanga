@@ -2,16 +2,33 @@
 
 ## Instalar e iniciar
 
-**Pasta portátil** (`npm run dist:win` gera `release/Flor de Pitanga/` e o `.zip`):
+`npm run dist:win` gera `release/instalador/Flor-de-Pitanga-Instalador-<versão>.exe`. O mesmo arquivo sai no CI, como artefato `instalador-windows` de cada execução — prefira esse, porque o Node embutido é o do `.nvmrc`.
 
-1. Copie a pasta para o computador (por exemplo `C:\Flor de Pitanga`; evite OneDrive e `Program Files`).
-2. Dê dois cliques em **`iniciar.bat`**. O navegador abre em `http://127.0.0.1:1971`. Não feche a janela preta enquanto usa.
-3. Primeira vez: o aplicativo pede para criar a administradora.
-4. Para encerrar, feche a janela preta ou use **`parar.bat`**.
+1. Copie o instalador para o computador e dê dois cliques. Ele instala só para a usuária atual, em `%LOCALAPPDATA%\Programs`, e **não pede administrador**.
+2. Como o programa não é assinado, o Windows mostra **"O Windows protegeu o computador"** (SmartScreen). Clique em **Mais informações** e depois em **Executar assim mesmo**.
+3. O programa abre sozinho ao terminar. Depois, use o ícone **Flor de Pitanga** na Área de Trabalho ou no menu Iniciar.
+4. Para encerrar, feche a janela. A API termina junto, depois de concluir qualquer backup em andamento.
 
-**Instalador com janela própria** (opcional): `npm run dist:win -- --instalador` gera, com o Electron, um `.exe` com atalho na área de trabalho e janela sem barra de endereço. O Electron só sobe a API como processo filho com o Node embutido — o módulo nativo `better-sqlite3` não precisa ser recompilado.
+Não há senha nem primeiro acesso. Com a janela fechada, `http://127.0.0.1:1971` não responde.
 
-**Iniciar com o Windows** (opcional, sem administrador): `powershell -ExecutionPolicy Bypass -File instalar-servico.ps1` (`-Remover` desfaz).
+### Como funciona por baixo
+
+A janela (Electron) sobe a API como processo filho, com o Node embutido e sem console. Ao fechar, pede o encerramento por IPC e espera até 8 s (o tempo de backup ou restauração não conta). Só então força o fim do processo. Se a janela cair, a API encerra sozinha. Ver [ADR 0007](adr/0007-abertura-sem-terminal.md).
+
+### Modo suporte (com console)
+
+Para diagnóstico, feche a janela e abra `suporte\iniciar.bat`, dentro da pasta do programa (`%LOCALAPPDATA%\Programs\flor-de-pitanga\resources\suporte`): o servidor roda com console e o navegador abre em `http://127.0.0.1:1971`. `parar.bat` encerra. Se abrir o ícone com o modo suporte ligado, a janela usa o servidor que já está no ar e **não o encerra** ao fechar.
+
+`npm run dist:win -- --sem-instalador` gera só a pasta portátil (`release/Flor de Pitanga/` e `.zip`), com os mesmos scripts em `suporte/`.
+
+`instalar-servico.ps1` deixa a API rodando ao entrar no Windows e não é necessário com a janela. Se já tiver sido usado, remova: `powershell -ExecutionPolicy Bypass -File instalar-servico.ps1 -Remover`.
+
+### Trocar a pasta portátil antiga pelo instalador
+
+1. Na versão antiga, faça um backup na tela _Backup_ e copie o `.zip` para um pendrive.
+2. Feche a janela preta (ou use `parar.bat`). Se a tarefa agendada foi instalada, remova-a (acima).
+3. Instale a versão nova. Ela encontra o banco em `%LOCALAPPDATA%\FlorDePitanga` e, se houver atualização de banco, guarda antes uma cópia `pre-migracao-*.db`.
+4. Confira no _Painel_ se os números são os mesmos. Só então apague a pasta antiga e os atalhos dela.
 
 ## Onde ficam os dados
 
@@ -37,15 +54,17 @@ Defina `FDP_DATA_DIR` para mudar o local e `FDP_PORT` para mudar a porta. **Nunc
 
 ## Atualizar
 
-Feche o aplicativo, faça um backup, substitua a pasta `app/` (e `runtime/`) pela nova versão mantendo `%LOCALAPPDATA%\FlorDePitanga`, e inicie. As migrations pendentes rodam sozinhas, com cópia de segurança antes.
+Faça um backup, feche a janela e execute o instalador novo por cima. Os dados em `%LOCALAPPDATA%\FlorDePitanga` não são tocados. As migrations pendentes rodam sozinhas, com cópia de segurança antes. Desinstalar pelo Windows remove só o programa; os dados ficam.
 
 ## Problemas comuns
 
 | Sintoma                                          | O que fazer                                                                                                                                        |
 | ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| "A porta 1971 já está em uso"                    | Há outra instância aberta: use `parar.bat`, ou defina outra `FDP_PORT`.                                                                            |
+| "Outra versão do Flor de Pitanga já está aberta" | A pasta antiga (janela preta) ou a tarefa agendada está no ar. Feche a janela preta ou use `parar.bat` e clique em _Tentar de novo_.               |
+| "Não consegui abrir o programa"                  | Outro programa usa a porta 1971, ou a API falhou ao subir: veja os logs. Para trocar a porta, defina `FDP_PORT`.                                   |
+| "A porta 1971 já está em uso" (modo suporte)     | A janela do programa está aberta: feche-a antes.                                                                                                   |
 | O app não inicia e cita OneDrive/Dropbox         | Escolha outra pasta com `FDP_DATA_DIR` (ex.: `C:\FlorDePitanga\dados`).                                                                            |
-| SmartScreen: "aplicativo não reconhecido"        | O programa não é assinado digitalmente: _Mais informações → Executar assim mesmo_. Assinar o instalador exige certificado.                         |
+| SmartScreen: "O Windows protegeu o computador"   | O programa não é assinado digitalmente (decisão do cliente): _Mais informações → Executar assim mesmo_.                                            |
 | Erro de módulo nativo depois de atualizar o Node | Versão do Node fixada em `engines`/`.nvmrc`; rode `npm rebuild`. A tela _Configurações → Sistema_ e `GET /api/saude` mostram versão e integridade. |
 
 ## Limitações

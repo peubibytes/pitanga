@@ -4,6 +4,7 @@ import { categoriaSchema, type Categoria, type TipoCategoria } from '@pitanga/sh
 import { createPortal } from 'react-dom';
 import { Alerta, Botao, Campo, Entrada, Modal } from '../../components/ui';
 import { api, mensagemDoErro } from '../../lib/api';
+import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useMutacao } from '../../lib/query';
 
 /** Cria ou renomeia uma categoria. Pode abrir por cima de outro formulário, sem enviá-lo. */
@@ -24,6 +25,7 @@ export function ModalCategoria({
     resolver: zodResolver(categoriaSchema.pick({ nome: true })),
     values: { nome: categoria?.nome ?? '' },
   });
+  useAvisoDeSaida(aberto && f.formState.isDirty);
   const salvar = useMutacao(
     ({ nome }: { nome: string }) =>
       categoria

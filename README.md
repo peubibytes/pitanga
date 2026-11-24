@@ -41,19 +41,20 @@ npm start             # http://127.0.0.1:1971
 
 ### Scripts
 
-| Script                                              | Ação                                                                                              |
-| --------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `npm run dev`                                       | Sobe API (`tsx watch`) e front (Vite) em paralelo                                                 |
-| `npm run build`                                     | Valida `shared` e `core`, empacota a API (tsup) e gera o estático do front                        |
-| `npm start`                                         | Roda a API compilada servindo o front já construído                                               |
-| `npm run db:migrate`                                | Aplica migrations pendentes                                                                       |
-| `npm run db:seed` / `db:reset`                      | Dados fictícios (reset apaga e recria — só em desenvolvimento)                                    |
-| `npm run db:check`                                  | Confere as dez invariantes e o `integrity_check`                                                  |
-| `npm run backup` / `npm run restore -- <zip> --sim` | Backup e restauração pela linha de comando                                                        |
-| `npm run senha -- <usuario> <nova>`                 | Redefine a senha de uma usuária (esquecimento)                                                    |
-| `npm test`                                          | Vitest em todos os pacotes                                                                        |
-| `npm run lint` / `npm run typecheck`                | ESLint e `tsc --noEmit`                                                                           |
-| `npm run dist:win`                                  | Pacote portátil para Windows (`release/Flor de Pitanga/`); `-- --instalador` gera também o `.exe` |
+| Script                                              | Ação                                                                                               |
+| --------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `npm run dev`                                       | Sobe API (`tsx watch`) e front (Vite) em paralelo                                                  |
+| `npm run build`                                     | Valida `shared` e `core`, empacota a API (tsup) e gera o estático do front                         |
+| `npm start`                                         | Roda a API compilada servindo o front já construído                                                |
+| `npm run db:migrate`                                | Aplica migrations pendentes                                                                        |
+| `npm run db:seed` / `db:reset`                      | Dados fictícios (reset apaga e recria — só em desenvolvimento)                                     |
+| `npm run db:check`                                  | Confere as dez invariantes e o `integrity_check`                                                   |
+| `npm run backup` / `npm run restore -- <zip> --sim` | Backup e restauração pela linha de comando                                                         |
+| `npm run senha -- <usuario> <nova>`                 | Redefine a senha de uma usuária (esquecimento)                                                     |
+| `npm test`                                          | Vitest em todos os pacotes                                                                         |
+| `npm run lint` / `npm run typecheck`                | ESLint e `tsc --noEmit`                                                                            |
+| `npm run dist:win`                                  | Instalador do Windows (`release/instalador/*.exe`); `-- --sem-instalador` gera só a pasta portátil |
+| `npm run icone`                                     | Regera o ícone do aplicativo a partir de `favicon.svg`                                             |
 
 ### Onde ficam os dados
 
@@ -66,7 +67,7 @@ packages/shared   contratos (Zod), dinheiro/quantidade em inteiros, formatação
 packages/core     regras de cálculo puras: custo médio, ficha, lote, preço, apuração financeira
 apps/api          Express + better-sqlite3: rotas → serviços → repositórios → SQL
 apps/web          React + Vite + TanStack Query + react-hook-form + Tailwind
-apps/desktop      casca Electron (opcional): sobe a API e abre uma janela sem barra de endereço
+apps/desktop      casca Electron: janela própria que sobe a API e a encerra ao fechar (ADR 0007)
 tools/            CLIs (db, backup, senha), empacotamento e scripts do Windows
 docs/             modelo de dados, regras de custeio, manual da usuária, operação, ADRs
 ```

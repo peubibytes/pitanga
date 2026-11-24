@@ -8,6 +8,7 @@
     "build": "tsup",
     "start": "npm run build && electron .",
     "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
     "dist": "npm run build && electron-builder --win --publish never"
   },
   "description": "Casca desktop (Electron) do Flor de Pitanga",
@@ -15,6 +16,13 @@
   "build": {
     "appId": "br.com.flordepitanga.app",
     "productName": "Flor de Pitanga",
+    "extraMetadata": {
+      "name": "flor-de-pitanga"
+    },
+    "npmRebuild": false,
+    "electronLanguages": [
+      "pt-BR"
+    ],
     "directories": {
       "output": "../../release/instalador"
     },
@@ -28,23 +36,39 @@
         "to": "app"
       },
       {
+        "from": "../../release/Flor de Pitanga/app/node_modules",
+        "to": "app/node_modules"
+      },
+      {
         "from": "../../release/Flor de Pitanga/runtime",
         "to": "runtime"
+      },
+      {
+        "from": "../../release/Flor de Pitanga/suporte",
+        "to": "suporte"
       }
     ],
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "icon": "build/icone.ico",
+      "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
-      "oneClick": false,
-      "allowToChangeInstallationDirectory": true,
+      "oneClick": true,
       "perMachine": false,
-      "createDesktopShortcut": true,
-      "shortcutName": "Flor de Pitanga"
+      "createDesktopShortcut": "always",
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true,
+      "deleteAppDataOnUninstall": false,
+      "packElevateHelper": false,
+      "shortcutName": "Flor de Pitanga",
+      "uninstallDisplayName": "Flor de Pitanga ${version}",
+      "artifactName": "Flor-de-Pitanga-Instalador-${version}.${ext}",
+      "language": "1046"
     }
   },
   "devDependencies": {
-    "electron": "^45.4.1",
+    "electron": "45.4.1",
     "electron-builder": "^26.18.0"
   }
 }
