@@ -2,7 +2,7 @@
 
 SQLite em arquivo único (`flor-de-pitanga.db`), modo WAL, `foreign_keys = ON`, `synchronous = FULL`. Schema em `apps/api/src/db/migrations/` (`0001_inicial`, `0002_indices`, `0003_dados_base`) — migration aplicada nunca é editada (checksum). Fotos ficam fora do banco, em `dados/fotos/<uuid>.webp`.
 
-**Convenções.** Todas as tabelas têm `id INTEGER PRIMARY KEY AUTOINCREMENT` e `criado_em`; as editáveis, `atualizado_em`. Datas de negócio em ISO `AAAA-MM-DD`. Dinheiro: totais em **centavos**, unitários em **micro-reais**, quantidades em **mili-unidades**, percentuais em **centésimos de ponto percentual**. Nada é apagado: registros têm `ativo`/`status` e cancelamentos geram estorno.
+**Convenções.** Todas as tabelas têm `id INTEGER PRIMARY KEY AUTOINCREMENT` e `criado_em`; as editáveis, `atualizado_em`. Datas de negócio em ISO `AAAA-MM-DD`. Dinheiro: totais em **centavos**, unitários em **micro-reais**, quantidades em **mili-unidades**, percentuais em **centésimos de ponto percentual**. Nada é apagado: registros têm `ativo`/`status` e cancelamentos geram estorno. Exceção: uma categoria pode ser removida depois de seus itens irem para outra, com nome, destino e itens movidos na auditoria.
 
 ## Diagrama
 

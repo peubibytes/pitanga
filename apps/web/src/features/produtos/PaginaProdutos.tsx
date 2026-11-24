@@ -99,6 +99,7 @@ export function ModalProduto({
                   <SeletorCategoria
                     id={id}
                     tipo="produto"
+                    permitirNova
                     valor={field.value ?? null}
                     onChange={field.onChange}
                   />

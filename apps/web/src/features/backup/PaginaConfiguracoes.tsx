@@ -28,6 +28,7 @@ import {
 import { api } from '../../lib/api';
 import { useAuth } from '../../lib/auth';
 import { useDados, useMutacao } from '../../lib/query';
+import { Categorias } from '../categorias/Categorias';
 
 /* ---------------------------------- geral ---------------------------------- */
 
@@ -345,23 +346,25 @@ function Sistema() {
 }
 
 export default function PaginaConfiguracoes() {
-  const [aba, setAba] = useState<'geral' | 'taxas' | 'sistema'>('geral');
+  const [aba, setAba] = useState<'geral' | 'categorias' | 'taxas' | 'sistema'>('geral');
   return (
     <>
       <PaginaCabecalho
         titulo="Configurações"
-        subtitulo="Parâmetros do ateliê, taxas e informações do sistema."
+        subtitulo="Parâmetros do ateliê, categorias, taxas e informações do sistema."
       />
       <Abas
         ativa={aba}
         aoMudar={setAba}
         abas={[
           { id: 'geral', rotulo: 'Geral' },
+          { id: 'categorias', rotulo: 'Categorias' },
           { id: 'taxas', rotulo: 'Taxas' },
           { id: 'sistema', rotulo: 'Sistema' },
         ]}
       />
       {aba === 'geral' && <Geral />}
+      {aba === 'categorias' && <Categorias />}
       {aba === 'taxas' && <Taxas />}
       {aba === 'sistema' && <Sistema />}
     </>

@@ -79,6 +79,8 @@ export interface Categoria {
   nome: string;
   tipo: TipoCategoria;
   ativo: boolean;
+  /** Quantos produtos ou materiais (ativos ou não) estão nesta categoria. */
+  emUso: number;
 }
 export interface Unidade {
   codigo: string;

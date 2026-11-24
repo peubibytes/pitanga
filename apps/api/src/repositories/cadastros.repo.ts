@@ -165,31 +165,84 @@ export function atualizarFornecedor(
 
 /* ------------------------------ categorias e unidades ------------------------------ */
 
+const SQL_CATEGORIA = `
+  SELECT id, nome, tipo, ativo,
+         CASE tipo WHEN 'material' THEN (SELECT COUNT(*) FROM materiais m WHERE m.categoria_id = c.id)
+                   ELSE (SELECT COUNT(*) FROM produtos p WHERE p.categoria_id = c.id) END AS emUso
+    FROM categorias c`;
+const paraCategoria = (c: Omit<Categoria, 'ativo'> & { ativo: number }): Categoria => ({
+  ...c,
+  ativo: comoBooleano(c.ativo),
+});
+
 export function listarCategorias(db: Db, tipo?: TipoCategoria): Categoria[] {
   const filtros = new Filtros();
   if (tipo) filtros.adicionar('tipo = ?', tipo);
   return todos<Omit<Categoria, 'ativo'> & { ativo: number }>(
     db,
-    `SELECT id, nome, tipo, ativo FROM categorias ${filtros.where} ORDER BY nome COLLATE NOCASE`,
+    `${SQL_CATEGORIA} ${filtros.where} ORDER BY nome COLLATE NOCASE`,
     ...filtros.params,
-  ).map((c) => ({ ...c, ativo: comoBooleano(c.ativo) }));
+  ).map(paraCategoria);
 }
 
 export function inserirCategoria(db: Db, c: { nome: string; tipo: TipoCategoria }): number {
   return executar(db, `INSERT INTO categorias (nome, tipo) VALUES (?,?)`, c.nome, c.tipo).id;
 }
 
-export function categoriaExiste(db: Db, nome: string, tipo: TipoCategoria): boolean {
-  return !!um(db, `SELECT 1 FROM categorias WHERE nome = ? AND tipo = ?`, nome, tipo);
+/** Nome já usado por outra categoria do mesmo tipo, sem distinguir maiúsculas nem acentos. */
+export function categoriaExiste(
+  db: Db,
+  nome: string,
+  tipo: TipoCategoria,
+  excetoId: number | null = null,
+): boolean {
+  return !!um(
+    db,
+    `SELECT 1 FROM categorias WHERE norm(nome) = norm(?) AND tipo = ? AND id IS NOT ?`,
+    nome,
+    tipo,
+    excetoId,
+  );
 }
 
 export const buscarCategoria = (db: Db, id: number): Categoria | undefined => {
   const c = um<Omit<Categoria, 'ativo'> & { ativo: number }>(
     db,
-    `SELECT id, nome, tipo, ativo FROM categorias WHERE id = ?`,
+    `${SQL_CATEGORIA} WHERE id = ?`,
     id,
   );
-  return c ? { ...c, ativo: comoBooleano(c.ativo) } : undefined;
+  return c ? paraCategoria(c) : undefined;
+};
+
+export const renomearCategoria = (db: Db, id: number, nome: string): void => {
+  executar(db, `UPDATE categorias SET nome = ? WHERE id = ?`, nome, id);
+};
+
+/** Move todos os itens (ativos ou não) de uma categoria para outra; devolve os ids movidos. */
+export function moverItensDaCategoria(
+  db: Db,
+  tipo: TipoCategoria,
+  deId: number,
+  paraId: number,
+): number[] {
+  const tabela = tipo === 'material' ? 'materiais' : 'produtos';
+  const ids = todos<{ id: number }>(
+    db,
+    `SELECT id FROM ${tabela} WHERE categoria_id = ? ORDER BY id`,
+    deId,
+  ).map((l) => l.id);
+  executar(
+    db,
+    `UPDATE ${tabela} SET categoria_id = ?, atualizado_em = ? WHERE categoria_id = ?`,
+    paraId,
+    agora(),
+    deId,
+  );
+  return ids;
+}
+
+export const removerCategoria = (db: Db, id: number): void => {
+  executar(db, `DELETE FROM categorias WHERE id = ?`, id);
 };
 
 export const listarUnidades = (db: Db): Unidade[] =>

@@ -10,6 +10,8 @@ import type {
 } from '@pitanga/shared';
 import { formatarQuantidade } from '@pitanga/shared';
 import { useQuery } from '@tanstack/react-query';
+import { useState } from 'react';
+import { ModalCategoria } from '../features/categorias/ModalCategoria';
 import { api } from '../lib/api';
 import { useLista } from '../lib/query';
 import { Selecao } from './ui';
@@ -134,23 +136,48 @@ export function SeletorFornecedor({
   );
 }
 
+const NOVA_CATEGORIA = 'nova';
+
+/** `permitirNova`: acrescenta "+ Nova categoria" (cadastros; nos filtros não faz sentido). */
 export function SeletorCategoria({
   tipo,
   valor,
   onChange,
   placeholder = 'Sem categoria',
+  excluir = [],
+  permitirNova,
   ...r
-}: Base & { tipo: TipoCategoria }) {
+}: Base & { tipo: TipoCategoria; excluir?: number[]; permitirNova?: boolean }) {
   const { data } = useCategorias(tipo);
+  const [criando, setCriando] = useState(false);
   return (
-    <Selecao value={valor ?? ''} onChange={(e) => onChange(paraId(e.target.value))} {...r}>
-      <option value="">{placeholder}</option>
-      {data?.map((c) => (
-        <option key={c.id} value={c.id}>
-          {c.nome}
-        </option>
-      ))}
-    </Selecao>
+    <>
+      <Selecao
+        value={valor ?? ''}
+        onChange={(e) =>
+          e.target.value === NOVA_CATEGORIA ? setCriando(true) : onChange(paraId(e.target.value))
+        }
+        {...r}
+      >
+        <option value="">{placeholder}</option>
+        {data
+          ?.filter((c) => !excluir.includes(c.id))
+          .map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.nome}
+            </option>
+          ))}
+        {permitirNova && <option value={NOVA_CATEGORIA}>+ Nova categoria</option>}
+      </Selecao>
+      {permitirNova && (
+        <ModalCategoria
+          aberto={criando}
+          aoFechar={() => setCriando(false)}
+          tipo={tipo}
+          aoSalvar={(c) => onChange(c.id)}
+        />
+      )}
+    </>
   );
 }
 

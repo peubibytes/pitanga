@@ -12,6 +12,7 @@ O Flor de Pitanga roda só no seu computador, em `http://127.0.0.1:1971`, e não
 - **Fornecedores** — as lojas onde você compra.
 - **Materiais** — essências, frascos, varetas, cera… Escolha a **unidade de controle** (unidade, ml, g ou metro). Você pode comprar em litro, quilo ou caixa: o sistema converte. Defina o **estoque mínimo** para ser avisada. Para corrigir um cadastro, use o botão **Editar** na linha do material.
 - **Produtos** — o que você vende, com foto, descrição e categoria.
+- **Categorias** — organizam produtos e materiais. No cadastro, escolha **+ Nova categoria** para criar uma na hora. Para renomear ou remover, use _Configurações → Categorias_; se a categoria tiver itens, o sistema pergunta para onde movê-los.
 
 ## 3. Comprar material
 

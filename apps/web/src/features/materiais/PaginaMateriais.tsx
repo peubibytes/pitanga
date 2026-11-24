@@ -115,6 +115,7 @@ export function ModalMaterial({
                   <SeletorCategoria
                     id={id}
                     tipo="material"
+                    permitirNova
                     valor={field.value ?? null}
                     onChange={field.onChange}
                   />

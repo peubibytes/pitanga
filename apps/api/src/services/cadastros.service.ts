@@ -1,6 +1,7 @@
 import type {
   Categoria,
   CategoriaEntrada,
+  CategoriaRenomearEntrada,
   Cliente,
   ClienteEntrada,
   ClienteResumo,
@@ -13,6 +14,7 @@ import type {
   Unidade,
 } from '@pitanga/shared';
 import {
+  categoriaRenomearSchema,
   categoriaSchema,
   clienteSchema,
   configuracoesSchema,
@@ -20,7 +22,7 @@ import {
   taxaSchema,
 } from '@pitanga/shared';
 import type { Contexto } from '../db/util';
-import { ErroDeValidacao, RegistroNaoEncontrado } from '../erros';
+import { CategoriaEmUso, ErroDeValidacao, RegistroNaoEncontrado } from '../erros';
 import * as repo from '../repositories/cadastros.repo';
 import {
   gravarConfiguracao,
@@ -122,13 +124,87 @@ export function atualizarFornecedor(
 export const listarCategorias = (ctx: Contexto, tipo?: TipoCategoria): Categoria[] =>
   repo.listarCategorias(ctx.db, tipo);
 
+function obterCategoria(ctx: Contexto, id: number): Categoria {
+  const c = repo.buscarCategoria(ctx.db, id);
+  if (!c) throw new RegistroNaoEncontrado('Categoria');
+  return c;
+}
+
+function recusarNomeRepetido(
+  ctx: Contexto,
+  nome: string,
+  tipo: TipoCategoria,
+  excetoId?: number,
+): void {
+  if (repo.categoriaExiste(ctx.db, nome, tipo, excetoId)) {
+    throw new ErroDeValidacao(`Já existe a categoria "${nome}".`);
+  }
+}
+
 export function criarCategoria(ctx: Contexto, entrada: CategoriaEntrada): Categoria {
   const dados = categoriaSchema.parse(entrada);
-  if (repo.categoriaExiste(ctx.db, dados.nome, dados.tipo)) {
-    throw new ErroDeValidacao(`Já existe a categoria "${dados.nome}".`);
-  }
+  recusarNomeRepetido(ctx, dados.nome, dados.tipo);
   const id = repo.inserirCategoria(ctx.db, dados);
-  return repo.buscarCategoria(ctx.db, id)!;
+  inserirAuditoria(ctx.db, {
+    usuarioId: ctx.usuarioId,
+    acao: 'criar',
+    entidade: 'categoria',
+    entidadeId: id,
+    dados,
+  });
+  return obterCategoria(ctx, id);
+}
+
+export function renomearCategoria(
+  ctx: Contexto,
+  id: number,
+  entrada: CategoriaRenomearEntrada,
+): Categoria {
+  const atual = obterCategoria(ctx, id);
+  const { nome } = categoriaRenomearSchema.parse(entrada);
+  recusarNomeRepetido(ctx, nome, atual.tipo, id);
+  repo.renomearCategoria(ctx.db, id, nome);
+  inserirAuditoria(ctx.db, {
+    usuarioId: ctx.usuarioId,
+    acao: 'editar',
+    entidade: 'categoria',
+    entidadeId: id,
+    dados: { tipo: atual.tipo, de: atual.nome, para: nome },
+  });
+  return obterCategoria(ctx, id);
+}
+
+/**
+ * Remove uma categoria. Com itens dentro, exige `moverPara`: os itens mudam de categoria e a antiga
+ * é apagada na mesma transação, com a lista do que foi movido na auditoria.
+ */
+export function removerCategoria(
+  ctx: Contexto,
+  id: number,
+  moverPara?: number,
+): { id: number; movidos: number } {
+  const atual = obterCategoria(ctx, id);
+  const destino = moverPara === undefined ? null : obterCategoria(ctx, moverPara);
+  if (destino && (destino.id === id || destino.tipo !== atual.tipo)) {
+    throw new ErroDeValidacao('Escolha outra categoria do mesmo tipo para receber os itens.');
+  }
+  return ctx.db.transaction(() => {
+    if (atual.emUso > 0 && !destino) throw new CategoriaEmUso(atual.nome, atual.emUso);
+    const movidos = destino ? repo.moverItensDaCategoria(ctx.db, atual.tipo, id, destino.id) : [];
+    repo.removerCategoria(ctx.db, id);
+    inserirAuditoria(ctx.db, {
+      usuarioId: ctx.usuarioId,
+      acao: 'excluir',
+      entidade: 'categoria',
+      entidadeId: id,
+      dados: {
+        nome: atual.nome,
+        tipo: atual.tipo,
+        ...(destino && { movidosPara: { id: destino.id, nome: destino.nome }, itens: movidos }),
+      },
+    });
+    return { id, movidos: movidos.length };
+  })();
 }
 
 export const listarUnidades = (ctx: Contexto): Unidade[] => repo.listarUnidades(ctx.db);

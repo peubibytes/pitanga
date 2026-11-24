@@ -72,6 +72,9 @@ export const categoriaSchema = z.object({
   tipo: z.enum(TIPOS_CATEGORIA),
 });
 
+/** O tipo não muda depois de criada: os itens da categoria são de um tipo só. */
+export const categoriaRenomearSchema = categoriaSchema.pick({ nome: true });
+
 export const taxaSchema = z.object({
   nome: nomeSchema,
   tipo: z.enum(TIPOS_TAXA),
@@ -328,6 +331,7 @@ export type UsuarioEntrada = z.input<typeof usuarioSchema>;
 export type ClienteEntrada = z.input<typeof clienteSchema>;
 export type FornecedorEntrada = z.input<typeof fornecedorSchema>;
 export type CategoriaEntrada = z.input<typeof categoriaSchema>;
+export type CategoriaRenomearEntrada = z.input<typeof categoriaRenomearSchema>;
 export type TaxaEntrada = z.input<typeof taxaSchema>;
 export type MaterialEntrada = z.input<typeof materialSchema>;
 export type AjusteEstoqueEntrada = z.input<typeof ajusteEstoqueSchema>;
