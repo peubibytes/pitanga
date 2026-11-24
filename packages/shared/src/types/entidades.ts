@@ -116,6 +116,40 @@ export interface Material {
   /** Já tem movimentos de estoque ou entra em receitas: a unidade não muda pela edição comum. */
   unidadeTravada: boolean;
 }
+/** Como um material fica em cada lado da troca de unidade. */
+export interface LadoDaTroca {
+  unidade: string;
+  estoque: number;
+  estoqueMinimo: number | null;
+  custoMedio: number;
+  /** Estoque × custo médio, em centavos. */
+  valorEmEstoque: number;
+}
+export interface ReceitaNaTroca {
+  fichaId: number;
+  produtoId: number;
+  produtoNome: string;
+  /** Mili-unidades da unidade atual e da nova (a mais próxima possível). */
+  quantidadeAtual: number;
+  quantidadeNova: number;
+  /** Diferença da conversão, em centésimos de ponto percentual (com sinal). */
+  desvio: number;
+  /** Custo do material na receita, em micro-reais. */
+  custoAtual: number;
+  custoNovo: number;
+  /** Passou de 1% ou zerou: a usuária aceita ou corrige a quantidade. */
+  exigeDecisao: boolean;
+}
+export interface PreviaTrocaUnidade {
+  materialId: number;
+  nome: string;
+  antes: LadoDaTroca;
+  depois: LadoDaTroca;
+  receitas: ReceitaNaTroca[];
+  /** Linhas do histórico que serão convertidas. */
+  contagem: { movimentos: number; compras: number; producoes: number; receitasAntigas: number };
+  assinatura: string;
+}
 export interface MovimentoMaterial {
   id: number;
   materialId: number;

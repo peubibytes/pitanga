@@ -109,7 +109,7 @@ describe('ModalMaterial (edição)', () => {
     const unidade = screen.getByLabelText('Unidade de controle');
     expect(unidade).toHaveValue('Mililitro (ml)');
     expect(unidade).toBeDisabled();
-    expect(unidade).toHaveAccessibleDescription(/Não muda por aqui/);
+    expect(unidade).toHaveAccessibleDescription(/a troca converte tudo/);
   });
 
   it('deixa escolher a unidade quando o material ainda não foi usado', async () => {

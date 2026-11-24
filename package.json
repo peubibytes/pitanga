@@ -1,6 +1,6 @@
 {
   "name": "flor-de-pitanga",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "description": "Gestão de ateliê: estoque, custeio, produção, vendas e financeiro — Flor de Pitanga",
   "type": "module",

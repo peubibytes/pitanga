@@ -19,6 +19,7 @@ import { ErroDeValidacao, OperacaoNaoPermitida, RegistroNaoEncontrado } from '..
 import { buscarTaxas } from '../repositories/cadastros.repo';
 import * as repo from '../repositories/fichas.repo';
 import { buscarMaterial } from '../repositories/materiais.repo';
+import { recusarUnidadeDesatualizada } from './materiais.service';
 import { definirPrecoVenda } from '../repositories/produtos.repo';
 import { inserirAuditoria } from '../repositories/sistema.repo';
 import { obterProduto } from './produtos.service';
@@ -46,6 +47,7 @@ function gravarItens(
   for (const i of dados.itens) {
     const material = buscarMaterial(ctx.db, i.materialId);
     if (!material) throw new RegistroNaoEncontrado('Material da ficha');
+    recusarUnidadeDesatualizada(material, i.unidade);
     repo.inserirItemFicha(ctx.db, { fichaId, ...i });
   }
   for (const e of dados.extras) repo.inserirExtraFicha(ctx.db, { fichaId, ...e });

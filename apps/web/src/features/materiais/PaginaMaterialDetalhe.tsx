@@ -79,7 +79,12 @@ function ModalAjuste({
       quantidade: number;
       custoUnitario?: number;
       justificativa: string;
-    }) => api.post<Material>(`/materiais/${material.id}/ajuste`, { ...d, data: hojeISO() }),
+    }) =>
+      api.post<Material>(`/materiais/${material.id}/ajuste`, {
+        ...d,
+        unidade: material.unidade,
+        data: hojeISO(),
+      }),
     {
       sucesso: 'Ajuste registrado.',
       aoConcluir: () => {

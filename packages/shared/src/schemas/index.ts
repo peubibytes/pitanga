@@ -104,8 +104,27 @@ export const materialSchema = z.object({
   ativo: z.boolean().default(true),
 });
 
+/** Fator como dois inteiros (mili): `quantidadeNova` da unidade nova = `quantidadeAtual` da atual. */
+export const trocaUnidadePreviaSchema = z.object({
+  novaUnidade: z.enum(UNIDADES_BASE, { error: 'Escolha a nova unidade' }),
+  quantidadeNova: inteiroPositivo.max(1_000_000_000, 'Valor grande demais'),
+  quantidadeAtual: inteiroPositivo.max(1_000_000_000, 'Valor grande demais'),
+});
+
+export const trocaUnidadeSchema = trocaUnidadePreviaSchema.extend({
+  /** Quantidade (mili, na unidade nova) escolhida para cada receita que pediu decisão. */
+  receitas: z.array(z.object({ fichaId: idSchema, quantidade: inteiroPositivo })).default([]),
+  motivo: textoOpcional,
+  /** A que veio na prévia: garante que se aplica o que a usuária viu. */
+  assinatura: z.string().min(1),
+});
+
+/** Unidade em que a tela mostrava a quantidade; recusa a gravação se ela mudou nesse meio-tempo. */
+const unidadeVista = z.string().optional();
+
 export const ajusteEstoqueSchema = z.object({
   tipo: z.enum(['entrada', 'saida']),
+  unidade: unidadeVista,
   /** Mili-unidades (material) ou unidades inteiras (produto), sempre positivo. */
   quantidade: inteiroPositivo,
   /** Só para entradas de material sem custo médio vigente (micro-reais por unidade base). */
@@ -166,6 +185,7 @@ export const fichaItemSchema = z.object({
   materialId: idSchema,
   /** Mili-unidades da unidade base do material, por rendimento da ficha. */
   quantidade: inteiroPositivo,
+  unidade: unidadeVista,
   observacao: textoOpcional,
 });
 
@@ -334,6 +354,8 @@ export type CategoriaEntrada = z.input<typeof categoriaSchema>;
 export type CategoriaRenomearEntrada = z.input<typeof categoriaRenomearSchema>;
 export type TaxaEntrada = z.input<typeof taxaSchema>;
 export type MaterialEntrada = z.input<typeof materialSchema>;
+export type TrocaUnidadePreviaEntrada = z.input<typeof trocaUnidadePreviaSchema>;
+export type TrocaUnidadeEntrada = z.input<typeof trocaUnidadeSchema>;
 export type AjusteEstoqueEntrada = z.input<typeof ajusteEstoqueSchema>;
 export type CompraEntrada = z.input<typeof compraSchema>;
 export type CompraItemEntrada = z.input<typeof compraItemSchema>;

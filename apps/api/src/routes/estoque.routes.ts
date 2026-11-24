@@ -4,6 +4,7 @@ import { z } from 'zod';
 import * as comprasRepo from '../repositories/compras.repo';
 import * as compras from '../services/compras.service';
 import * as materiais from '../services/materiais.service';
+import * as trocaUnidade from '../services/troca-unidade.service';
 import { type Dependencias, consulta, ctxDe, idDe, lista, ok, paginaPadrao } from './helpers';
 
 export function estoqueRoutes(deps: Dependencias): Router {
@@ -52,6 +53,13 @@ export function estoqueRoutes(deps: Dependencias): Router {
   });
   r.post('/materiais/:id/ajuste', (req, res) =>
     ok(res, materiais.ajustarEstoque(ctxDe(deps, req), idDe(req), req.body)),
+  );
+
+  r.post('/materiais/:id/trocar-unidade/previa', (req, res) =>
+    ok(res, trocaUnidade.previaDaTroca(ctxDe(deps, req), idDe(req), req.body)),
+  );
+  r.post('/materiais/:id/trocar-unidade', (req, res) =>
+    ok(res, trocaUnidade.trocarUnidade(ctxDe(deps, req), deps.config, idDe(req), req.body)),
   );
 
   /* --------------------------------- compras --------------------------------- */

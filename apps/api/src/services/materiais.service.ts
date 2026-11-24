@@ -26,6 +26,19 @@ export function obterMaterial(ctx: Contexto, id: number): Material {
   return m;
 }
 
+/** A tela mandou a quantidade em uma unidade que não é mais a do material (trocada em outra aba). */
+export function recusarUnidadeDesatualizada(
+  material: Pick<Material, 'nome' | 'unidade'>,
+  unidade: string | undefined,
+): void {
+  if (unidade !== undefined && unidade !== material.unidade) {
+    throw new OperacaoNaoPermitida(
+      `A unidade de ${material.nome} mudou de "${unidade}" para "${material.unidade}" enquanto esta tela estava aberta. Saia desta tela e entre de novo antes de salvar.`,
+      'UNIDADE_DESATUALIZADA',
+    );
+  }
+}
+
 function validarCategoria(ctx: Contexto, categoriaId: number | null): void {
   if (categoriaId && buscarCategoria(ctx.db, categoriaId)?.tipo !== 'material') {
     throw new ErroDeValidacao('Categoria de material inválida.');
@@ -85,6 +98,7 @@ export function historicoDeCustos(ctx: Contexto, id: number): HistoricoCustoMate
 export function ajustarEstoque(ctx: Contexto, id: number, entrada: AjusteEstoqueEntrada): Material {
   const dados = ajusteEstoqueSchema.parse(entrada);
   const material = obterMaterial(ctx, id);
+  recusarUnidadeDesatualizada(material, dados.unidade);
   const data = dados.data ?? hojeISO();
   const entra = dados.tipo === 'entrada';
   if (entra && material.custoMedio === 0 && !dados.custoUnitario) {

@@ -45,7 +45,8 @@ interface FichaForm {
   maoObraMinutos: number | null;
   maoObraValorFixo: number | null;
   observacao: string;
-  itens: { materialId: number | null; quantidade: number | null }[];
+  /** `unidade`: a que valia quando a quantidade foi carregada; o servidor recusa se mudou. */
+  itens: { materialId: number | null; quantidade: number | null; unidade?: string }[];
   extras: { descricao: string; valor: number | null; tipo: TipoExtraFicha; porUnidade: boolean }[];
 }
 
@@ -107,7 +108,11 @@ export default function PaginaFichaEditor() {
         maoObraValorFixo: existente.maoObraValorFixo,
         observacao: existente.observacao ?? '',
         itens: existente.itens.length
-          ? existente.itens.map((i) => ({ materialId: i.materialId, quantidade: i.quantidade }))
+          ? existente.itens.map((i) => ({
+              materialId: i.materialId,
+              quantidade: i.quantidade,
+              unidade: i.unidade,
+            }))
           : [{ materialId: null, quantidade: null }],
         extras: existente.extras.map((e) => ({
           descricao: e.descricao,
@@ -174,7 +179,11 @@ export default function PaginaFichaEditor() {
       maoObraMinutos: d.maoObraModo === 'hora' ? d.maoObraMinutos : null,
       maoObraValorFixo: d.maoObraModo === 'fixo' ? d.maoObraValorFixo : null,
       observacao: d.observacao || null,
-      itens: itensValidos.map((i) => ({ materialId: i.materialId!, quantidade: i.quantidade! })),
+      itens: itensValidos.map((i) => ({
+        materialId: i.materialId!,
+        quantidade: i.quantidade!,
+        unidade: i.unidade,
+      })),
       extras: d.extras
         .filter((e) => e.descricao.trim())
         .map((e) => ({
@@ -270,7 +279,10 @@ export default function PaginaFichaEditor() {
                             <SeletorMaterial
                               id={id}
                               valor={field.value}
-                              onChange={field.onChange}
+                              onChange={(novo) => {
+                                field.onChange(novo);
+                                f.setValue(`itens.${idx}.unidade`, porId.get(novo ?? 0)?.unidade);
+                              }}
                               excluir={(v.itens ?? []).map((i) => i?.materialId ?? 0)}
                             />
                           )}
