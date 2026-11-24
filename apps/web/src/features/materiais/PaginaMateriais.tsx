@@ -35,6 +35,7 @@ import { api, mensagemDoErro } from '../../lib/api';
 import { useAvisoDeSaida } from '../../lib/avisoDeSaida';
 import { useLista, useMutacao } from '../../lib/query';
 import { useDebounce } from '../../lib/util';
+import { ModalTrocaUnidade } from './ModalTrocaUnidade';
 
 type Formulario = z.input<typeof materialSchema>;
 
@@ -60,6 +61,7 @@ export function ModalMaterial({
   useAvisoDeSaida(aberto && f.formState.isDirty);
   const unidade = f.watch('unidade');
   const travada = material?.unidadeTravada ?? false;
+  const [trocandoUnidade, setTrocandoUnidade] = useState(false);
   const navegar = useNavigate();
   const salvar = useMutacao(
     (d: MaterialEntrada) =>
@@ -129,7 +131,9 @@ export function ModalMaterial({
             rotulo="Unidade de controle"
             dica={
               travada
-                ? 'Não muda por aqui porque este material já tem compras, ajustes ou receitas.'
+                ? f.formState.isDirty
+                  ? 'Para trocar a unidade, antes salve ou cancele o que você mudou aqui.'
+                  : 'Este material já tem compras, ajustes ou receitas: a troca converte tudo.'
                 : 'Em que unidade o estoque é contado. Compras em litro, quilo ou caixa são convertidas.'
             }
             erro={e.unidade?.message}
@@ -137,12 +141,21 @@ export function ModalMaterial({
             {({ id, descricao }) =>
               travada ? (
                 // Só leitura e fora do formulário: o valor salvo continua em `values` e vai no envio.
-                <Entrada
-                  id={id}
-                  aria-describedby={descricao}
-                  disabled
-                  value={`${nomesUnidade[unidade] ?? unidade} (${unidade})`}
-                />
+                <div className="flex gap-2">
+                  <Entrada
+                    id={id}
+                    aria-describedby={descricao}
+                    disabled
+                    value={`${nomesUnidade[unidade] ?? unidade} (${unidade})`}
+                  />
+                  <Botao
+                    className="shrink-0"
+                    disabled={f.formState.isDirty}
+                    onClick={() => setTrocandoUnidade(true)}
+                  >
+                    Trocar unidade
+                  </Botao>
+                </div>
               ) : (
                 <Selecao id={id} aria-describedby={descricao} {...f.register('unidade')}>
                   {UNIDADES_BASE.map((u) => (
@@ -187,6 +200,16 @@ export function ModalMaterial({
         )}
         <button type="submit" className="hidden" />
       </form>
+      {material && trocandoUnidade && (
+        <ModalTrocaUnidade
+          material={material}
+          aoFechar={() => setTrocandoUnidade(false)}
+          aoTrocar={() => {
+            setTrocandoUnidade(false);
+            fechar();
+          }}
+        />
+      )}
     </Modal>
   );
 }

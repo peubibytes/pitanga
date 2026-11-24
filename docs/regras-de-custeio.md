@@ -22,6 +22,10 @@ Despesas da compra são rateadas entre os itens **por valor** ou **por quantidad
 
 Com estoque zerado ou negativo, o custo médio passa a ser o custo da própria entrada. Cancelar uma compra desfaz a entrada **pelo valor original** (e recompõe o custo médio); se o material já foi consumido, o cancelamento é recusado.
 
+### Troca da unidade de controle
+
+`quantidade_nova = quantidade × nova ÷ atual` e `custo_novo = custo × atual ÷ nova`, com o fator em dois inteiros (1 un = 1000 ml → 1000 e 1.000.000 mili-unidades). Os movimentos são convertidos pelo saldo acumulado, para a soma continuar igual ao estoque, e nenhum valor em reais já lançado muda. Detalhes e arredondamentos na [ADR 0008](adr/0008-unidade-de-controle-editavel.md).
+
 ## 2. Custo da ficha técnica (por peça)
 
 ```

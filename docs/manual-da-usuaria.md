@@ -78,6 +78,7 @@ Lembre-se: **caixa negativo com lucro positivo é normal** — o dinheiro está 
 
 ## 10. Dúvidas frequentes
 
+**Cadastrei um material na unidade errada e já comprei.** Abra _Materiais_, clique em **Editar** na linha dele e em **Trocar unidade**. Diga quanto cabe em uma unidade (por exemplo, 1.000 ml em 1 frasco) e confira como vão ficar o estoque e o custo. Só muda depois que você confirmar, e o sistema faz um backup antes. Se uma receita usa uma quantidade muito pequena, a tela pergunta quanto colocar no lugar.
 **Apareceu "Outra versão do Flor de Pitanga já está aberta".** Feche a janela preta da versão antiga e clique em _Tentar de novo_.
 **Fechei a janela e o endereço no navegador parou de funcionar.** É assim mesmo: agora o programa usa a própria janela. Abra pelo ícone.
 **O custo de um material mudou sozinho.** É o custo médio: a cada compra ele é recalculado com o que você pagou.

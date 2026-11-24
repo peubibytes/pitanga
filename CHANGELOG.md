@@ -15,6 +15,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) · versiona
 - **Encerramento limpo:** fechar a janela encerra a API por IPC (fallback após 8 s), esperando backup ou restauração em andamento. Se a janela cair, a API encerra sozinha.
 - **Confirmação ao fechar** a janela só quando há formulário com alterações não salvas.
 - Aviso quando outra versão do programa já está aberta, em vez de usar a API antiga sem dizer nada.
+- **Troca de unidade em material já usado:** assistente com prévia do estoque, do custo e das receitas, e gravação só depois de confirmar. Converte movimentos, compras, produções e receitas numa transação, com backup automático antes e os números originais na auditoria. Receitas que mudariam mais de 1% são decididas uma a uma. Nenhum valor em reais já lançado muda. Ver ADR 0008.
 - **Categorias:** criar, renomear e remover categorias de produtos e de materiais em _Configurações → Categorias_, e "+ Nova categoria" dentro dos cadastros. Categoria em uso só sai movendo os itens para outra, numa transação. Criar, renomear, mover e remover ficam na auditoria; nomes repetidos são recusados sem distinguir maiúsculas nem acentos.
 
 ### Corrigido
