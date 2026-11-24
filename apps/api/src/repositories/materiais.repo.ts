@@ -11,17 +11,21 @@ const SQL_MATERIAL = `
   SELECT m.id, m.nome, m.categoria_id AS categoriaId, c.nome AS categoriaNome, m.unidade,
          m.estoque_atual AS estoqueAtual, m.estoque_minimo AS estoqueMinimo,
          m.custo_medio AS custoMedio, m.ativo,
-         (m.estoque_minimo IS NOT NULL AND m.estoque_atual <= m.estoque_minimo) AS estoqueBaixo
+         (m.estoque_minimo IS NOT NULL AND m.estoque_atual <= m.estoque_minimo) AS estoqueBaixo,
+         (EXISTS (SELECT 1 FROM materiais_movimentos mm WHERE mm.material_id = m.id)
+          OR EXISTS (SELECT 1 FROM fichas_itens fi WHERE fi.material_id = m.id)) AS unidadeTravada
     FROM materiais m LEFT JOIN categorias c ON c.id = m.categoria_id`;
 
-type LinhaMaterial = Omit<Material, 'ativo' | 'estoqueBaixo'> & {
+type LinhaMaterial = Omit<Material, 'ativo' | 'estoqueBaixo' | 'unidadeTravada'> & {
   ativo: number;
   estoqueBaixo: number;
+  unidadeTravada: number;
 };
 const paraMaterial = (l: LinhaMaterial): Material => ({
   ...l,
   ativo: comoBooleano(l.ativo),
   estoqueBaixo: comoBooleano(l.estoqueBaixo),
+  unidadeTravada: comoBooleano(l.unidadeTravada),
 });
 
 export function listarMateriais(
@@ -104,9 +108,6 @@ export function atualizarMaterial(
     id,
   );
 }
-
-export const materialTemMovimentos = (db: Db, id: number): boolean =>
-  !!um(db, `SELECT 1 FROM materiais_movimentos WHERE material_id = ? LIMIT 1`, id);
 
 export function atualizarSaldoMaterial(
   db: Db,

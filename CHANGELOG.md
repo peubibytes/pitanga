@@ -8,6 +8,12 @@ Formato: [Keep a Changelog](https://keepachangelog.com/pt-BR/1.1.0/) · versiona
 
 - **Modo 100% local, sem login:** o app abre direto no Painel em `http://127.0.0.1:1971` (porta padrão, antes 4317). A API age como a primeira administradora ativa (criada como "Ateliê" se não houver nenhuma); saíram a tela de entrada, o botão "Sair" e a aba "Usuárias". Novo filtro do cabeçalho `Host` (só `127.0.0.1`, `localhost`, `[::1]`) contra DNS rebinding.
 
+### Corrigido
+
+- **Edição de materiais:** botão "Editar" em cada linha da lista; a mensagem de erro da API aparece dentro da janela (antes ficava atrás dela, e "Salvar" parecia não fazer nada); cancelar descarta o que foi digitado.
+- **Unidade do material:** a API recusa trocar a unidade também quando o material é usado em receitas (antes, 250 ml viravam 250 un em silêncio). A tela só trava a unidade quando a API travaria.
+- Tabelas: Enter em um botão da linha não abre mais o detalhe da linha.
+
 ### Pendente do plano
 
 - Roteiros fim a fim com Playwright (etapa 8, opcional) e geração do instalador `.exe` assinado.

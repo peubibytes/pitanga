@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { AlertTriangle, Plus, Search } from 'lucide-react';
+import { AlertTriangle, Pencil, Plus, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router';
@@ -18,6 +18,7 @@ import type { z } from 'zod';
 import { PaginaCabecalho } from '../../components/layout/PaginaCabecalho';
 import { SeletorCategoria } from '../../components/selecionadores';
 import {
+  Alerta,
   Botao,
   Campo,
   Cartao,
@@ -30,7 +31,7 @@ import {
   Selecao,
   Tabela,
 } from '../../components/ui';
-import { api } from '../../lib/api';
+import { api, mensagemDoErro } from '../../lib/api';
 import { useLista, useMutacao } from '../../lib/query';
 import { useDebounce } from '../../lib/util';
 
@@ -56,6 +57,7 @@ export function ModalMaterial({
     },
   });
   const unidade = f.watch('unidade');
+  const travada = material?.unidadeTravada ?? false;
   const navegar = useNavigate();
   const salvar = useMutacao(
     (d: MaterialEntrada) =>
@@ -64,23 +66,30 @@ export function ModalMaterial({
         : api.post<Material>('/materiais', d),
     {
       sucesso: material ? 'Material atualizado.' : 'Material cadastrado.',
+      // O erro aparece dentro da janela: o aviso flutuante fica atrás dela.
+      silencioso: true,
       aoConcluir: (m) => {
-        aoFechar();
-        f.reset();
+        fechar();
         if (!material) navegar(`/materiais/${m.id}`);
       },
     },
   );
+  /** Fechar descarta o que foi digitado: reabrir começa do que está salvo. */
+  const fechar = () => {
+    f.reset();
+    salvar.reset();
+    aoFechar();
+  };
   const e = f.formState.errors;
   const nomesUnidade = Object.fromEntries(UNIDADES.map((u) => [u.codigo, u.nome]));
   return (
     <Modal
       aberto={aberto}
-      aoFechar={aoFechar}
+      aoFechar={fechar}
       titulo={material ? 'Editar material' : 'Novo material'}
       rodape={
         <>
-          <Botao onClick={aoFechar}>Cancelar</Botao>
+          <Botao onClick={fechar}>Cancelar</Botao>
           <Botao
             variante="primario"
             carregando={salvar.isPending}
@@ -92,6 +101,7 @@ export function ModalMaterial({
       }
     >
       <form className="space-y-4" onSubmit={f.handleSubmit((d) => salvar.mutate(d))}>
+        {salvar.isError && <Alerta tom="pitanga">{mensagemDoErro(salvar.error)}</Alerta>}
         <Campo rotulo="Nome" erro={e.nome?.message} obrigatorio>
           {({ id }) => <Entrada id={id} autoFocus {...f.register('nome')} />}
         </Campo>
@@ -114,18 +124,32 @@ export function ModalMaterial({
           </Campo>
           <Campo
             rotulo="Unidade de controle"
-            dica="Em que unidade o estoque é contado. Compras em litro, quilo ou caixa são convertidas."
+            dica={
+              travada
+                ? 'Não muda por aqui porque este material já tem compras, ajustes ou receitas.'
+                : 'Em que unidade o estoque é contado. Compras em litro, quilo ou caixa são convertidas.'
+            }
             erro={e.unidade?.message}
           >
-            {({ id }) => (
-              <Selecao id={id} disabled={!!material} {...f.register('unidade')}>
-                {UNIDADES_BASE.map((u) => (
-                  <option key={u} value={u}>
-                    {nomesUnidade[u]} ({u})
-                  </option>
-                ))}
-              </Selecao>
-            )}
+            {({ id, descricao }) =>
+              travada ? (
+                // Só leitura e fora do formulário: o valor salvo continua em `values` e vai no envio.
+                <Entrada
+                  id={id}
+                  aria-describedby={descricao}
+                  disabled
+                  value={`${nomesUnidade[unidade] ?? unidade} (${unidade})`}
+                />
+              ) : (
+                <Selecao id={id} aria-describedby={descricao} {...f.register('unidade')}>
+                  {UNIDADES_BASE.map((u) => (
+                    <option key={u} value={u}>
+                      {nomesUnidade[u]} ({u})
+                    </option>
+                  ))}
+                </Selecao>
+              )
+            }
           </Campo>
         </div>
         <Campo
@@ -170,6 +194,7 @@ export default function PaginaMateriais() {
   const [categoria, setCategoria] = useState<number | null>(null);
   const [pagina, setPagina] = useState(1);
   const [novo, setNovo] = useState(false);
+  const [editando, setEditando] = useState<Material | null>(null);
   const termo = useDebounce(busca);
   const navegar = useNavigate();
   const { data, isLoading } = useLista<Material>('materiais', '/materiais', {
@@ -315,7 +340,23 @@ export default function PaginaMateriais() {
               {
                 titulo: '',
                 alinhar: 'direita',
-                celula: (m) => (!m.ativo ? <Chip>Inativo</Chip> : null),
+                celula: (m) => (
+                  <span className="flex items-center justify-end gap-2">
+                    {!m.ativo && <Chip>Inativo</Chip>}
+                    <Botao
+                      tamanho="p"
+                      icone={<Pencil className="h-4 w-4" />}
+                      aria-label={`Editar ${m.nome}`}
+                      onClick={(e) => {
+                        // A linha inteira leva ao detalhe; este botão só abre a edição.
+                        e.stopPropagation();
+                        setEditando(m);
+                      }}
+                    >
+                      Editar
+                    </Botao>
+                  </span>
+                ),
               },
             ]}
           />
@@ -323,6 +364,12 @@ export default function PaginaMateriais() {
         </div>
       </Cartao>
       <ModalMaterial aberto={novo} aoFechar={() => setNovo(false)} />
+      <ModalMaterial
+        key={editando?.id ?? 'nenhum'}
+        aberto={editando !== null}
+        aoFechar={() => setEditando(null)}
+        material={editando ?? undefined}
+      />
     </>
   );
 }

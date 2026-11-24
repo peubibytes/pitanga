@@ -111,6 +111,8 @@ export interface Material {
   custoMedio: number;
   ativo: boolean;
   estoqueBaixo: boolean;
+  /** Já tem movimentos de estoque ou entra em receitas: a unidade não muda pela edição comum. */
+  unidadeTravada: boolean;
 }
 export interface MovimentoMaterial {
   id: number;

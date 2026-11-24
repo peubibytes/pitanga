@@ -74,7 +74,12 @@ export function Tabela<T>({
               key={chave(l)}
               onClick={aoClicar ? () => aoClicar(l) : undefined}
               onKeyDown={
-                aoClicar ? (e) => (e.key === 'Enter' ? aoClicar(l) : undefined) : undefined
+                // Só quando o foco está na própria linha: Enter num botão da linha é do botão.
+                aoClicar
+                  ? (e) => {
+                      if (e.key === 'Enter' && e.target === e.currentTarget) aoClicar(l);
+                    }
+                  : undefined
               }
               tabIndex={aoClicar ? 0 : undefined}
               className={clsx(

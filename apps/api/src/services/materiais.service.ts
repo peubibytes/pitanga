@@ -49,9 +49,11 @@ export function atualizarMaterial(ctx: Contexto, id: number, entrada: MaterialEn
   const atual = obterMaterial(ctx, id);
   const dados = materialSchema.parse(entrada);
   validarCategoria(ctx, dados.categoriaId);
-  if (dados.unidade !== atual.unidade && repo.materialTemMovimentos(ctx.db, id)) {
+  // Receitas também guardam quantidade na unidade do material: trocar só a sigla mudaria a receita.
+  if (dados.unidade !== atual.unidade && atual.unidadeTravada) {
     throw new OperacaoNaoPermitida(
-      'Não é possível trocar a unidade de um material que já tem movimentos de estoque.',
+      'Não é possível trocar a unidade de um material que já tem movimentos de estoque ou é usado em receitas.',
+      'UNIDADE_TRAVADA',
     );
   }
   repo.atualizarMaterial(ctx.db, id, dados);

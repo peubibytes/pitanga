@@ -10,7 +10,7 @@ O Flor de Pitanga roda só no seu computador, em `http://127.0.0.1:1971`, e não
 
 - **Clientes** — nome, telefone e observações (aromas favoritos, datas especiais). Na ficha do cliente você vê o total comprado, as compras e o que ele ainda deve. Vendas sem cliente ficam como "consumidor não identificado".
 - **Fornecedores** — as lojas onde você compra.
-- **Materiais** — essências, frascos, varetas, cera… Escolha a **unidade de controle** (unidade, ml, g ou metro). Você pode comprar em litro, quilo ou caixa: o sistema converte. Defina o **estoque mínimo** para ser avisada.
+- **Materiais** — essências, frascos, varetas, cera… Escolha a **unidade de controle** (unidade, ml, g ou metro). Você pode comprar em litro, quilo ou caixa: o sistema converte. Defina o **estoque mínimo** para ser avisada. Para corrigir um cadastro, use o botão **Editar** na linha do material.
 - **Produtos** — o que você vende, com foto, descrição e categoria.
 
 ## 3. Comprar material
